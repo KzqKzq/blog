@@ -22,6 +22,32 @@ UI 复杂度增长的第一信号是 props 四处漂移。约束数据流、约�
 - State Reducer：让父组件控制状态机，解耦可视化与业务决策。
 - Render Props & Slot：把“要渲染什么”交还调用方，保持组件的抽象性。
 - Custom Hooks：把副作用与跨组件逻辑提炼出来，和 UI 组件保持松耦合。
+### 关键模式1
+- Compound Components：用 Context 打包状态与意图，避免 props drilling。
+- State Reducer：让父组件控制状态机，解耦可视化与业务决策。
+- Render Props & Slot：把“要渲染什么”交还调用方，保持组件的抽象性。
+- Custom Hooks：把副作用与跨组件逻辑提炼出来，和 UI 组件保持松耦合。
+### 关键模式2
+- Compound Components：用 Context 打包状态与意图，避免 props drilling。
+- State Reducer：让父组件控制状态机，解耦可视化与业务决策。
+- Render Props & Slot：把“要渲染什么”交还调用方，保持组件的抽象性。
+- Custom Hooks：把副作用与跨组件逻辑提炼出来，和 UI 组件保持松耦合。
+### 关键模式3
+- Compound Components：用 Context 打包状态与意图，避免 props drilling。
+- State Reducer：让父组件控制状态机，解耦可视化与业务决策。
+- Render Props & Slot：把“要渲染什么”交还调用方，保持组件的抽象性。
+- Custom Hooks：把副作用与跨组件逻辑提炼出来，和 UI 组件保持松耦合。
+### 关键模式4
+- Compound Components：用 Context 打包状态与意图，避免 props drilling。
+- State Reducer：让父组件控制状态机，解耦可视化与业务决策。
+- Render Props & Slot：把“要渲染什么”交还调用方，保持组件的抽象性。
+- Custom Hooks：把副作用与跨组件逻辑提炼出来，和 UI 组件保持松耦合。
+### 关键模式5
+- Compound Components：用 Context 打包状态与意图，避免 props drilling。
+- State Reducer：让父组件控制状态机，解耦可视化与业务决策。
+- Render Props & Slot：把“要渲染什么”交还调用方，保持组件的抽象性。
+- Custom Hooks：把副作用与跨组件逻辑提炼出来，和 UI 组件保持松耦合。
+
 
 ### 实战建议
 1. 先画状态机，再决定 props；避免“猜测式” API。
