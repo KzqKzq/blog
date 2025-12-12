@@ -13,13 +13,23 @@ export default function ArticlePage() {
   const { slug } = useParams<{ slug: string }>()
   const navigate = useNavigate()
   const [coverImage, setCoverImage] = useState<string | null>(null)
+  const [imageLoaded, setImageLoaded] = useState(false)
 
   const article = slug ? findArticleBySlug(slug) : undefined
   const headings = article ? extractHeadings(article.body) : []
 
   useEffect(() => {
+    setImageLoaded(false)
     fetchDailyImage().then((url) => {
-      if (url) setCoverImage(url)
+      if (url) {
+        // Preload image
+        const img = new Image()
+        img.onload = () => {
+          setCoverImage(url)
+          setImageLoaded(true)
+        }
+        img.src = url
+      }
     })
   }, [])
 
@@ -37,8 +47,6 @@ export default function ArticlePage() {
     )
   }
 
-
-
   return (
     <div className="article-page container">
       <motion.header
@@ -47,16 +55,21 @@ export default function ArticlePage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.25, ease: 'easeOut' }}
       >
-        {coverImage && (
-          <motion.img 
-            src={coverImage} 
-            alt="Daily Cover" 
-            className="article-cover"
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-          />
-        )}
+        <div className="article-cover-wrapper">
+          {!imageLoaded && (
+            <div className="article-cover article-cover--skeleton" />
+          )}
+          {coverImage && imageLoaded && (
+            <motion.img
+              src={coverImage}
+              alt="Daily Cover"
+              className="article-cover"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.4 }}
+            />
+          )}
+        </div>
         <div className="page-eyebrow">{article.category}</div>
         <h1 className="page-title">{article.title}</h1>
         <p className="page-desc">{article.description}</p>
@@ -73,23 +86,39 @@ export default function ArticlePage() {
 
       <div className="article-layout">
         <motion.div
-           className="article-main"
-           initial={{ opacity: 0, y: 18 }}
-           animate={{ opacity: 1, y: 0 }}
-           transition={{ duration: 0.28, ease: 'easeOut', delay: 0.05 }}
+          className="article-main"
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.28, ease: 'easeOut', delay: 0.05 }}
         >
           <Card className="soft-card glass-card article-shell">
             <ReactMarkdown
               className="prose article-body"
               components={{
                 h2: ({ node: _node, children, ...props }) => {
-                   const id = children?.toString().toLowerCase().replace(/\s+/g, '-').replace(/[^\w\u4e00-\u9fa5-]/g, '')
-                   return <h2 id={id} {...props}>{children}</h2>
+                  const id = children
+                    ?.toString()
+                    .toLowerCase()
+                    .replace(/\s+/g, '-')
+                    .replace(/[^\w\u4e00-\u9fa5-]/g, '')
+                  return (
+                    <h2 id={id} {...props}>
+                      {children}
+                    </h2>
+                  )
                 },
                 h3: ({ node: _node, children, ...props }) => {
-                   const id = children?.toString().toLowerCase().replace(/\s+/g, '-').replace(/[^\w\u4e00-\u9fa5-]/g, '')
-                   return <h3 id={id} {...props}>{children}</h3>
-                }
+                  const id = children
+                    ?.toString()
+                    .toLowerCase()
+                    .replace(/\s+/g, '-')
+                    .replace(/[^\w\u4e00-\u9fa5-]/g, '')
+                  return (
+                    <h3 id={id} {...props}>
+                      {children}
+                    </h3>
+                  )
+                },
               }}
             >
               {article.body}
@@ -98,7 +127,7 @@ export default function ArticlePage() {
         </motion.div>
 
         <aside>
-           <TableOfContents headings={headings} />
+          <TableOfContents headings={headings} />
         </aside>
       </div>
     </div>

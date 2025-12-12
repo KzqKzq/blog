@@ -1,0 +1,42 @@
+.back-to-top {
+    position: fixed;
+    right: var(--space-4);
+    bottom: var(--space-6);
+    z-index: 90;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: none;
+    background: var(--color-card);
+    color: var(--color-ink);
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-raised);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.back-to-top:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-raised-lg);
+    background: var(--color-brand);
+    color: #fff;
+}
+
+.back-to-top:active {
+    transform: scale(0.95);
+}
+
+.back-to-top__icon {
+    line-height: 1;
+    font-weight: 700;
+}
+
+/* On mobile, position it above the FloatingNav if both are present */
+@media (max-width: 900px) {
+    .back-to-top {
+        bottom: calc(var(--space-6) + 64px);
+    }
+}

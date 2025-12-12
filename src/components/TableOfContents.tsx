@@ -37,10 +37,7 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
       <div className="toc-title">目录</div>
       <ul className="toc-list">
         {headings.map((heading) => (
-          <li
-            key={heading.id}
-            className={`toc-item toc-item--h${heading.level}`}
-          >
+          <li key={heading.id} className={`toc-item toc-item--h${heading.level}`}>
             <a
               href={`#${heading.id}`}
               className={`toc-link ${activeId === heading.id ? 'active' : ''}`}
@@ -48,16 +45,12 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
                 e.preventDefault()
                 const element = document.getElementById(heading.id)
                 if (element) {
-                   // Offset for fixed header
-                   const headerOffset = 100
-                   const elementPosition = element.getBoundingClientRect().top
-                   const offsetPosition = elementPosition + window.pageYOffset - headerOffset
-  
-                   window.scrollTo({
-                     top: offsetPosition,
-                     behavior: "smooth"
-                   })
-                   setActiveId(heading.id)
+                  const headerOffset = 100
+                  const elementPosition = element.getBoundingClientRect().top
+                  const offsetPosition = elementPosition + window.pageYOffset - headerOffset
+
+                  window.scrollTo({ top: offsetPosition, behavior: 'smooth' })
+                  setActiveId(heading.id)
                 }
               }}
             >
@@ -66,13 +59,14 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
           </li>
         ))}
       </ul>
-      
+
       <div className="toc-footer">
-        <button 
+        <button
+          type="button"
           className="toc-back-to-top"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         >
-          ↑ 返回顶部
+          ← 返回顶部
         </button>
       </div>
     </nav>
