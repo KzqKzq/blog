@@ -162,7 +162,7 @@
 }
 
 .nav-card--brand .nav-icon {
-  background: rgba(222, 67, 49, 0.12);
+  background: rgba(20, 184, 166, 0.12);
 }
 
 .nav-card--cool .nav-icon {
@@ -242,19 +242,19 @@
 }
 
 .tag-brand {
-  color: var(--color-brand);
+  color: var(--color-ink);
 }
 
 .tag-amber {
-  color: var(--color-brand-secondary);
+  color: var(--color-ink);
 }
 
 .tag-cool {
-  color: #3b82f6;
+  color: var(--color-ink);
 }
 
 .tag-neutral {
-  color: var(--color-muted);
+  color: var(--color-ink);
 }
 
 @media (max-width: 1024px) {

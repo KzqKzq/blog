@@ -24,21 +24,7 @@
   margin-bottom: var(--space-3);
 }
 
-.badge--brand {
-  color: var(--color-brand);
-}
 
-.badge--amber {
-  color: var(--color-brand-secondary);
-}
-
-.badge--cool {
-  color: #3b82f6;
-}
-
-.badge--neutral {
-  color: var(--color-muted);
-}
 
 .blog-title {
   margin: 0 0 var(--space-2);

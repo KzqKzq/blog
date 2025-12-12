@@ -92,8 +92,8 @@ body.without-noise::after {
   position: absolute;
   inset: -1px;
   border-radius: inherit;
-  background: linear-gradient(135deg, rgba(222, 67, 49, 0.12), rgba(252, 200, 65, 0.16));
-  border: 1px solid rgba(222, 67, 49, 0.22);
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.12), rgba(110, 231, 183, 0.16));
+  border: 1px solid rgba(20, 184, 166, 0.22);
   box-shadow: var(--shadow-raised);
   z-index: 0;
 }
@@ -104,7 +104,7 @@ body.without-noise::after {
 }
 
 .nav-link--active {
-  border-color: rgba(222, 67, 49, 0.3);
+  border-color: rgba(20, 184, 166, 0.3);
   box-shadow: var(--shadow-raised-lg);
 }
 
