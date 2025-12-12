@@ -2,6 +2,24 @@
   padding-bottom: var(--space-16);
 }
 
+.article-cover {
+  width: 100vw;
+  height: 360px;
+  object-fit: cover;
+  border-radius: 0;
+  margin-bottom: var(--space-8);
+  box-shadow: var(--shadow-raised);
+  background-color: var(--color-card);
+  
+  /* Break out of container */
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  max-width: none;
+}
+
 .article-layout {
   display: grid;
   grid-template-columns: 1fr 240px;

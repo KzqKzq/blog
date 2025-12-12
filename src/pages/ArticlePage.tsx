@@ -1,17 +1,27 @@
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import ReactMarkdown from 'react-markdown'
 import { Button, Card, Tag } from '@kzqkzq/tactile-ui'
 import { findArticleBySlug } from '../data/content'
 import { extractHeadings } from '../utils/markdownUtils'
+import { fetchDailyImage } from '../utils/bingImageUtils'
 import { TableOfContents } from '../components/TableOfContents'
 import './ArticlePage.css'
 
 export default function ArticlePage() {
   const { slug } = useParams<{ slug: string }>()
   const navigate = useNavigate()
+  const [coverImage, setCoverImage] = useState<string | null>(null)
+
   const article = slug ? findArticleBySlug(slug) : undefined
   const headings = article ? extractHeadings(article.body) : []
+
+  useEffect(() => {
+    fetchDailyImage().then((url) => {
+      if (url) setCoverImage(url)
+    })
+  }, [])
 
   if (!article) {
     return (
@@ -37,6 +47,16 @@ export default function ArticlePage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.25, ease: 'easeOut' }}
       >
+        {coverImage && (
+          <motion.img 
+            src={coverImage} 
+            alt="Daily Cover" 
+            className="article-cover"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+          />
+        )}
         <div className="page-eyebrow">{article.category}</div>
         <h1 className="page-title">{article.title}</h1>
         <p className="page-desc">{article.description}</p>
