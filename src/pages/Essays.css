@@ -1,0 +1,28 @@
+.essays-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.essays-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: var(--article-width);
+  margin: 0 auto;
+}
+
+.essay-card {
+  padding: var(--space-6);
+}
+
+.essay-meta {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.essay-title {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-lg);
+}
