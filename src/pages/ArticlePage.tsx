@@ -1,37 +1,75 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import ReactMarkdown from 'react-markdown'
+import MDEditor from '@uiw/react-md-editor'
 import { Button, Card, Tag } from '@kzqkzq/tactile-ui'
-import { findArticleBySlug } from '../data/content'
+
+import { supabase, Article } from '../lib/supabase'
 import { extractHeadings } from '../utils/markdownUtils'
 import { fetchDailyImage } from '../utils/bingImageUtils'
 import { TableOfContents } from '../components/TableOfContents'
+import { parseArticleContent, fallbackMarkdownPayload } from '../utils/articleContent'
+
+// Use the same markdown styles for consistency
+import '@/styles/markdown.css'
 import './ArticlePage.css'
 
 export default function ArticlePage() {
   const { slug } = useParams<{ slug: string }>()
   const navigate = useNavigate()
+  const [article, setArticle] = useState<Article | null>(null)
+  const [loading, setLoading] = useState(true)
   const [coverImage, setCoverImage] = useState<string | null>(null)
   const [imageLoaded, setImageLoaded] = useState(false)
-
-  const article = slug ? findArticleBySlug(slug) : undefined
-  const headings = article ? extractHeadings(article.body) : []
+  const [contentMarkdown, setContentMarkdown] = useState('')
 
   useEffect(() => {
-    setImageLoaded(false)
-    fetchDailyImage().then((url) => {
-      if (url) {
-        // Preload image
-        const img = new Image()
-        img.onload = () => {
-          setCoverImage(url)
-          setImageLoaded(true)
-        }
-        img.src = url
+    if (slug) {
+      fetchArticle(slug)
+    }
+  }, [slug])
+
+  const fetchArticle = async (slug: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('articles')
+        .select('*')
+        .eq('slug', slug)
+        .single()
+
+      if (error) throw error
+      setArticle(data)
+
+      // Parse content
+      const payload = parseArticleContent(data.content)
+      setContentMarkdown(payload?.markdown || data.content || '')
+
+      // Cover Image Logic
+      if (data.cover_image) {
+        setCoverImage(data.cover_image)
+        setImageLoaded(true)
+      } else {
+        fetchDailyImage().then((url) => {
+          if (url) {
+            setCoverImage(url)
+            setImageLoaded(true)
+          }
+        })
       }
-    })
-  }, [])
+
+    } catch (error) {
+      console.error('Error fetching article:', error)
+      setArticle(null)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const headings = extractHeadings(contentMarkdown)
+
+  if (loading) {
+    return <div className="article-page container" style={{ paddingTop: '4rem', textAlign: 'center' }}>Loading...</div>
+  }
 
   if (!article) {
     return (
@@ -59,14 +97,15 @@ export default function ArticlePage() {
           {!imageLoaded && (
             <div className="article-cover article-cover--skeleton" />
           )}
-          {coverImage && imageLoaded && (
+          {coverImage && (
             <motion.img
               src={coverImage}
-              alt="Daily Cover"
+              alt="Cover"
               className="article-cover"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.4 }}
+              onLoad={() => setImageLoaded(true)}
             />
           )}
         </div>
@@ -74,10 +113,9 @@ export default function ArticlePage() {
         <h1 className="page-title">{article.title}</h1>
         <p className="page-desc">{article.description}</p>
         <div className="article-meta">
-          <span className="badge">{article.date}</span>
-          <span className="badge">{article.readingTime}</span>
-          {article.tags.map((tag) => (
-            <Tag key={tag} variant="primary" className={`tag-${article.accent || 'brand'}`}>
+          <span className="badge">{new Date(article.created_at).toLocaleDateString()}</span>
+          {article.tags && article.tags.map((tag) => (
+            <Tag key={tag} variant="primary" className="tag-brand">
               {tag}
             </Tag>
           ))}
@@ -92,42 +130,20 @@ export default function ArticlePage() {
           transition={{ duration: 0.28, ease: 'easeOut', delay: 0.05 }}
         >
           <Card className="soft-card glass-card article-shell">
-            <ReactMarkdown
-              className="prose article-body"
-              components={{
-                h2: ({ node: _node, children, ...props }) => {
-                  const id = children
-                    ?.toString()
-                    .toLowerCase()
-                    .replace(/\s+/g, '-')
-                    .replace(/[^\w\u4e00-\u9fa5-]/g, '')
-                  return (
-                    <h2 id={id} {...props}>
-                      {children}
-                    </h2>
-                  )
-                },
-                h3: ({ node: _node, children, ...props }) => {
-                  const id = children
-                    ?.toString()
-                    .toLowerCase()
-                    .replace(/\s+/g, '-')
-                    .replace(/[^\w\u4e00-\u9fa5-]/g, '')
-                  return (
-                    <h3 id={id} {...props}>
-                      {children}
-                    </h3>
-                  )
-                },
-              }}
-            >
-              {article.body}
-            </ReactMarkdown>
+            <div className="article-body">
+              <div data-color-mode="light">
+                <MDEditor.Markdown
+                  source={contentMarkdown}
+                  style={{ whiteSpace: 'pre-wrap' }}
+                />
+              </div>
+            </div>
           </Card>
         </motion.div>
 
         <aside>
           <TableOfContents headings={headings} />
+          {/* Add more widgets here if needed */}
         </aside>
       </div>
     </div>

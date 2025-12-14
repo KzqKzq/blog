@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, type ComponentProps, type ComponentType } from 'react'
 import GridLayout from 'react-grid-layout'
 import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
@@ -17,26 +17,48 @@ import {
 } from '../components/dashboard'
 import './Home.css'
 
-const COLS = 6
-const ROW_HEIGHT = 140
+const COLS = 12
+const ROW_HEIGHT = 100
 
-const defaultLayout = [
-  { i: 'heatmap', x: 0, y: 0, w: 4, h: 2, minW: 3, minH: 2 },
-  { i: 'travel', x: 4, y: 0, w: 2, h: 2, minW: 2, minH: 2 },
-  { i: 'tech', x: 0, y: 2, w: 2, h: 2, minW: 2, minH: 2 },
-  { i: 'goals', x: 2, y: 2, w: 2, h: 2, minW: 2, minH: 1 },
-  { i: 'reading', x: 4, y: 2, w: 2, h: 2, minW: 2, minH: 1 },
-  { i: 'projects', x: 0, y: 4, w: 2, h: 2, minW: 2, minH: 1 },
-  { i: 'writing', x: 2, y: 4, w: 1, h: 1, minW: 1, minH: 1 },
-  { i: 'stars', x: 3, y: 4, w: 1, h: 1, minW: 1, minH: 1 },
-  { i: 'playing', x: 4, y: 4, w: 1, h: 1, minW: 1, minH: 1 },
-  { i: 'status', x: 5, y: 4, w: 1, h: 1, minW: 1, minH: 1 },
-  { i: 'coffee', x: 2, y: 5, w: 1, h: 1, minW: 1, minH: 1 },
+type DashboardLayout = {
+  i: string
+  x: number
+  y: number
+  w: number
+  h: number
+  minW?: number
+  minH?: number
+  maxW?: number
+  maxH?: number
+  static?: boolean
+  isDraggable?: boolean
+  isResizable?: boolean
+}
+
+const defaultLayout: DashboardLayout[] = [
+  // Row 1: GitHub Heatmap (large) + Travel Map
+  { i: 'heatmap', x: 0, y: 0, w: 8, h: 3, minW: 6, minH: 2 },
+  { i: 'travel', x: 8, y: 0, w: 4, h: 3, minW: 3, minH: 2 },
+
+  // Row 2: Tech Radar + Year Goals + Reading List
+  { i: 'tech', x: 0, y: 3, w: 4, h: 3, minW: 3, minH: 2 },
+  { i: 'goals', x: 4, y: 3, w: 4, h: 3, minW: 3, minH: 2 },
+  { i: 'reading', x: 8, y: 3, w: 4, h: 3, minW: 3, minH: 2 },
+
+  // Row 3: Projects + Small widgets
+  { i: 'projects', x: 0, y: 6, w: 4, h: 2, minW: 3, minH: 2 },
+  { i: 'writing', x: 4, y: 6, w: 2, h: 2, minW: 2, minH: 1 },
+  { i: 'stars', x: 6, y: 6, w: 2, h: 2, minW: 2, minH: 1 },
+  { i: 'playing', x: 8, y: 6, w: 2, h: 2, minW: 2, minH: 1 },
+  { i: 'status', x: 10, y: 6, w: 2, h: 2, minW: 2, minH: 1 },
+
+  // Row 4: Coffee
+  { i: 'coffee', x: 4, y: 8, w: 2, h: 2, minW: 2, minH: 1 },
 ]
 
 const LAYOUT_KEY = 'dashboard-layout'
 
-function loadLayout() {
+function loadLayout(): DashboardLayout[] {
   try {
     const saved = localStorage.getItem(LAYOUT_KEY)
     return saved ? JSON.parse(saved) : defaultLayout
@@ -59,8 +81,11 @@ const widgetComponents: Record<string, React.ReactNode> = {
   coffee: <CoffeeCounter />,
 }
 
+type LayoutChangeHandler = ComponentProps<typeof GridLayout>['onLayoutChange']
+const TypedGridLayout = GridLayout as unknown as ComponentType<any>
+
 export default function Home() {
-  const [layout, setLayout] = useState(loadLayout)
+  const [layout, setLayout] = useState<DashboardLayout[]>(loadLayout)
   const [width, setWidth] = useState(1200)
 
   const containerRef = useCallback((node: HTMLDivElement | null) => {
@@ -75,9 +100,10 @@ export default function Home() {
     }
   }, [])
 
-  const handleLayoutChange = (newLayout: typeof layout) => {
-    setLayout(newLayout)
-    localStorage.setItem(LAYOUT_KEY, JSON.stringify(newLayout))
+  const handleLayoutChange: LayoutChangeHandler = (newLayout) => {
+    const nextLayout = newLayout.map((item) => ({ ...item })) as DashboardLayout[]
+    setLayout(nextLayout)
+    localStorage.setItem(LAYOUT_KEY, JSON.stringify(nextLayout))
   }
 
   const handleResetLayout = () => {
@@ -102,7 +128,7 @@ export default function Home() {
       </header>
 
       <div className="dashboard-grid" ref={containerRef}>
-        <GridLayout
+        <TypedGridLayout
           className="layout"
           layout={layout}
           cols={COLS}
@@ -114,12 +140,12 @@ export default function Home() {
           compactType="vertical"
           preventCollision={false}
         >
-          {layout.map((item: { i: string }) => (
+          {layout.map((item) => (
             <div key={item.i} className="dashboard-grid-item">
               {widgetComponents[item.i]}
             </div>
           ))}
-        </GridLayout>
+        </TypedGridLayout>
       </div>
     </div>
   )
