@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { githubUsername } from '../../data/dashboard'
 import { DashboardWidget } from './DashboardWidget'
+import { Skeleton } from '@/components/ui/skeleton'
 
 interface ContributionDay {
     date: string
@@ -18,28 +19,22 @@ export function GitHubHeatmap() {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        // Fetch GitHub contributions using the GitHub contributions calendar API
-        // Using a proxy service since GitHub doesn't have a public contributions API
         const fetchContributions = async () => {
             try {
-                // Generate mock data for demonstration
-                // In production, you'd use a service like github-contributions-api
+                // Generate mock data
                 const weeks: ContributionWeek[] = []
                 const today = new Date()
                 let total = 0
 
-                for (let w = 0; w < 52; w++) {
+                for (let w = 0; w < 20; w++) { // Show fewer weeks for simpler UI
                     const days: ContributionDay[] = []
                     for (let d = 0; d < 7; d++) {
                         const date = new Date(today)
-                        date.setDate(date.getDate() - (52 - w) * 7 - (6 - d))
+                        date.setDate(date.getDate() - (20 - w) * 7 - (6 - d))
 
-                        // Generate realistic-looking contribution data
                         const rand = Math.random()
                         let count = 0
                         let level = 0
-
-                        // Simulate weekday vs weekend patterns
                         const isWeekend = d === 0 || d === 6
                         const activityChance = isWeekend ? 0.3 : 0.7
 
@@ -75,25 +70,33 @@ export function GitHubHeatmap() {
     if (loading) {
         return (
             <DashboardWidget title="代码活动" icon="📊">
-                <div className="github-heatmap">
-                    <div style={{ padding: 'var(--space-4)', textAlign: 'center', color: 'var(--color-muted)' }}>
-                        加载中...
-                    </div>
+                <div className="flex items-center justify-center h-full">
+                    <Skeleton className="h-[100px] w-full" />
                 </div>
             </DashboardWidget>
         )
     }
 
+    const getLevelColor = (level: number) => {
+        switch (level) {
+            case 1: return 'bg-emerald-200 dark:bg-emerald-900'
+            case 2: return 'bg-emerald-300 dark:bg-emerald-700'
+            case 3: return 'bg-emerald-400 dark:bg-emerald-600'
+            case 4: return 'bg-emerald-500 dark:bg-emerald-500'
+            default: return 'bg-secondary'
+        }
+    }
+
     return (
         <DashboardWidget title="代码活动" icon="📊">
-            <div className="github-heatmap">
-                <div className="github-heatmap__grid">
+            <div className="flex flex-col h-full justify-between">
+                <div className="flex gap-1 overflow-hidden h-full items-center">
                     {contributions.map((week, weekIndex) => (
-                        <div key={weekIndex} className="github-heatmap__week">
+                        <div key={weekIndex} className="flex flex-col gap-1">
                             {week.days.map((day, dayIndex) => (
                                 <div
                                     key={dayIndex}
-                                    className={`github-heatmap__day github-heatmap__day--level-${day.level}`}
+                                    className={`w-2.5 h-2.5 rounded-sm ${getLevelColor(day.level)}`}
                                     title={`${day.date}: ${day.count} contributions`}
                                 />
                             ))}
@@ -101,14 +104,14 @@ export function GitHubHeatmap() {
                     ))}
                 </div>
 
-                <div className="github-heatmap__stats">
-                    <div className="github-heatmap__stat">
-                        <div className="github-heatmap__stat-value">{totalContributions}</div>
-                        <div className="github-heatmap__stat-label">年度贡献</div>
+                <div className="flex justify-between items-end text-xs text-muted-foreground mt-2">
+                    <div className="flex flex-col">
+                        <span className="text-2xl font-bold text-foreground">{totalContributions}</span>
+                        <span>年度贡献</span>
                     </div>
-                    <div className="github-heatmap__stat">
-                        <div className="github-heatmap__stat-value">@{githubUsername}</div>
-                        <div className="github-heatmap__stat-label">GitHub</div>
+                    <div className="text-right">
+                        <div className="font-medium text-primary">@{githubUsername}</div>
+                        <div>GitHub</div>
                     </div>
                 </div>
             </div>

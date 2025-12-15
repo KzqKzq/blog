@@ -1,10 +1,19 @@
-import { useEffect, useState } from 'react'
-import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { Link, Outlet, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Button, Switch } from '@kzqkzq/tactile-ui'
+import { Menu } from 'lucide-react'
+import { useState, useEffect } from 'react'
+
+import { Button } from '@/components/ui/button'
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet'
 import { FloatingNav } from './FloatingNav'
 import { BackToTop } from './BackToTop'
-import './Layout.css'
+import { cn } from '@/lib/utils'
 
 const navItems = [
   { path: '/', label: '首页' },
@@ -15,140 +24,121 @@ const navItems = [
 ]
 
 export default function Layout() {
-  const navigate = useNavigate()
   const location = useLocation()
-  const [showNoise, setShowNoise] = useState(true)
-  const [glassHeader, setGlassHeader] = useState(true)
-  const [navOpen, setNavOpen] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
+  const [open, setOpen] = useState(false)
 
+  // Handle scroll effect for header
   useEffect(() => {
-    document.body.classList.toggle('without-noise', !showNoise)
-  }, [showNoise])
-
-  // Close the mobile nav when the route changes
-  useEffect(() => setNavOpen(false), [location.pathname])
-
-  // Reset the nav state on resize to avoid stale open state
-  useEffect(() => {
-    const handleResize = () => setNavOpen(false)
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  // Close sheet on route change
+  useEffect(() => {
+    setOpen(false)
+  }, [location.pathname])
+
   return (
-    <div className="page-shell">
-      <div className="blur-blob blur-blob--brand" />
+    <div className="min-h-screen bg-background font-sans antialiased flex flex-col">
+      {/* Header */}
+      <header
+        className={cn(
+          "sticky top-0 z-50 w-full border-b backdrop-blur transition-all duration-200",
+          isScrolled ? "bg-background/80 border-border" : "bg-transparent border-transparent"
+        )}
+      >
+        <div className="container flex h-14 items-center justify-between">
+          <div className="flex items-center gap-6">
+            <Link to="/" className="flex items-center space-x-2 font-bold">
+              <span className="text-xl bg-gradient-to-tr from-primary to-teal-400 bg-clip-text text-transparent">
+                KZQ
+              </span>
+              <span className="hidden md:inline-block text-sm text-muted-foreground font-medium">/ 数字工坊</span>
+            </Link>
 
-      <header className={`site-header ${glassHeader ? 'site-header--glass' : ''}`}>
-        <div className="container site-header__row">
-          {/* Brand + Toggle (Mobile) */}
-          <div className="brand-row">
-            <NavLink to="/" className="brand">
-              <div className="brand-mark">KZQ</div>
-              <div className="brand-text">
-                <span className="brand-title">数字工坊</span>
-                <span className="brand-sub">新拟物 · 类型安全</span>
-              </div>
-            </NavLink>
-            <button
-              type="button"
-              className="nav-toggle"
-              aria-label="展开导航菜单"
-              aria-expanded={navOpen}
-              onClick={() => setNavOpen((open) => !open)}
-            >
-              <span className="nav-toggle__icon" aria-hidden="true" />
-              <span className="nav-toggle__label">菜单</span>
-            </button>
-          </div>
-
-          {/* Desktop Navigation - Always Visible */}
-          <nav className="site-nav site-nav--desktop">
-            <div className="site-nav__links">
+            {/* Desktop Nav */}
+            <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
               {navItems.map((item) => (
-                <NavLink
+                <Link
                   key={item.path}
                   to={item.path}
-                  className={({ isActive }) => `nav-link ${isActive ? 'nav-link--active' : ''}`}
-                >
-                  {({ isActive }) => (
-                    <>
-                      {isActive && (
-                        <motion.div
-                          layoutId="nav-active-desktop"
-                          className="nav-active"
-                          transition={{ type: 'spring', stiffness: 360, damping: 30 }}
-                        />
-                      )}
-                      <motion.span
-                        className="nav-label"
-                        whileHover={{ y: -1 }}
-                        transition={{ duration: 0.15 }}
-                      >
-                        {item.label}
-                      </motion.span>
-                    </>
+                  className={cn(
+                    "transition-colors hover:text-primary relative",
+                    location.pathname === item.path ? "text-foreground" : "text-muted-foreground"
                   )}
-                </NavLink>
+                >
+                  {item.label}
+                  {location.pathname === item.path && (
+                    <motion.div
+                      layoutId="navbar-indicator"
+                      className="absolute -bottom-[19px] left-0 right-0 h-[2px] bg-primary"
+                      transition={{ type: "spring", bounce: 0.25, duration: 0.5 }}
+                    />
+                  )}
+                </Link>
               ))}
-            </div>
+            </nav>
+          </div>
 
-          </nav>
-
-          {/* Mobile Navigation - Collapsible */}
-          <AnimatePresence initial={false}>
-            {navOpen && (
-              <motion.nav
-                className="site-nav site-nav--mobile"
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.22, ease: 'easeOut' }}
-              >
-                <div className="site-nav__links">
+          <div className="flex items-center gap-2">
+            {/* Mobile Nav Sheet */}
+            <Sheet open={open} onOpenChange={setOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="md:hidden">
+                  <Menu className="h-5 w-5" />
+                  <span className="sr-only">Toggle Menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="pr-0">
+                <SheetHeader className="px-1">
+                  <SheetTitle>
+                    <Link to="/" className="flex items-center space-x-2 font-bold select-none">
+                      <span className="text-xl bg-gradient-to-tr from-primary to-teal-400 bg-clip-text text-transparent">
+                        KZQ
+                      </span>
+                    </Link>
+                  </SheetTitle>
+                </SheetHeader>
+                <div className="flex flex-col gap-4 mt-8 mr-6">
                   {navItems.map((item) => (
-                    <NavLink
+                    <Link
                       key={item.path}
                       to={item.path}
-                      className={({ isActive }) => `nav-link ${isActive ? 'nav-link--active' : ''}`}
-                    >
-                      {({ isActive }) => (
-                        <>
-                          {isActive && (
-                            <motion.div
-                              layoutId="nav-active-mobile"
-                              className="nav-active"
-                              transition={{ type: 'spring', stiffness: 360, damping: 30 }}
-                            />
-                          )}
-                          <span className="nav-label">{item.label}</span>
-                        </>
+                      className={cn(
+                        "text-lg font-medium transition-colors hover:text-primary",
+                        location.pathname === item.path
+                          ? "text-foreground"
+                          : "text-muted-foreground"
                       )}
-                    </NavLink>
+                    >
+                      {item.label}
+                    </Link>
                   ))}
                 </div>
-
-
-              </motion.nav>
-            )}
-          </AnimatePresence>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </header>
 
-      <main className="site-main">
-        <div className="container">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={location.pathname}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.25, ease: 'easeOut' }}
-            >
-              <Outlet />
-            </motion.div>
-          </AnimatePresence>
-        </div>
+      {/* Main Content with Page Transition */}
+      <main className="flex-1 w-full container mx-auto py-6 md:py-10 relative">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={location.pathname}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className="w-full"
+          >
+            <Outlet />
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       <FloatingNav />

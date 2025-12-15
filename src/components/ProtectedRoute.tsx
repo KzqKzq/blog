@@ -1,21 +1,22 @@
-import { Navigate, Outlet } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { ReactNode } from 'react'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
 
-export default function ProtectedRoute() {
+interface ProtectedRouteProps {
+    children: ReactNode
+}
+
+export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     const { user, loading } = useAuth()
 
     if (loading) {
-        return <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100vh'
-        }}>Loading...</div>
+        return <LoadingSpinner fullPage size="lg" />
     }
 
     if (!user) {
         return <Navigate to="/admin/login" replace />
     }
 
-    return <Outlet />
+    return <>{children}</>
 }

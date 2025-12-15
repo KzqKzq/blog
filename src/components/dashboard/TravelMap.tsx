@@ -21,17 +21,18 @@ export function TravelMap() {
     const zoom = 3
 
     return (
-        <DashboardWidget title="旅行足迹" icon="🗺️" className="travel-map-widget">
-            <div className="travel-map-container">
+        <DashboardWidget title="旅行足迹" icon="🗺️" className="p-0 overflow-hidden">
+            <div className="relative w-full h-full min-h-[140px]">
                 <MapContainer
                     center={center}
                     zoom={zoom}
                     scrollWheelZoom={false}
-                    style={{ height: '100%', width: '100%', borderRadius: 'var(--radius-md)' }}
+                    className="w-full h-full rounded-md"
+                    style={{ background: 'transparent' }}
                 >
                     <TileLayer
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
                     />
                     {visitedCities.map((city) => (
                         <Marker
@@ -47,7 +48,7 @@ export function TravelMap() {
                         </Marker>
                     ))}
                 </MapContainer>
-                <div className="travel-map__count">
+                <div className="absolute bottom-2 right-2 bg-background/80 backdrop-blur-sm px-2 py-1 rounded text-xs font-medium z-[400] shadow-sm">
                     {visitedCities.length} 个城市
                 </div>
             </div>

@@ -6,10 +6,10 @@ export function CoffeeCounter() {
 
     return (
         <DashboardWidget title="咖啡" icon="☕">
-            <div className="coffee-counter">
-                <div className="coffee-counter__cups">{cups}</div>
-                <div className="coffee-counter__number">{coffeeStats.thisMonth}</div>
-                <div className="coffee-counter__label">本月杯数</div>
+            <div className="flex flex-col items-center justify-center h-full pb-2">
+                <div className="text-2xl mb-1 tracking-widest">{cups}</div>
+                <div className="text-2xl font-bold">{coffeeStats.thisMonth}</div>
+                <div className="text-xs text-muted-foreground mt-1">本月杯数</div>
             </div>
         </DashboardWidget>
     )

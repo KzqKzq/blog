@@ -1,20 +1,22 @@
 import { useEffect, useState, useRef } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import './FloatingNav.css'
+import { Home, PenTool, FolderGit2, BookOpen, User, X, Menu } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 
 const navItems = [
-    { path: '/', label: '首页', icon: '🏠' },
-    { path: '/blog', label: '博客', icon: '📝' },
-    { path: '/projects', label: '作品', icon: '🚀' },
-    { path: '/essays', label: '随笔', icon: '✍️' },
-    { path: '/about', label: '关于', icon: '👤' },
+    { path: '/', label: '首页', icon: Home },
+    { path: '/blog', label: '博客', icon: PenTool },
+    { path: '/projects', label: '作品', icon: FolderGit2 },
+    { path: '/essays', label: '随笔', icon: BookOpen },
+    { path: '/about', label: '关于', icon: User },
 ]
 
 export function FloatingNav() {
     const [visible, setVisible] = useState(false)
     const [expanded, setExpanded] = useState(false)
-    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null)
     const location = useLocation()
 
     // Hide when route changes
@@ -28,12 +30,10 @@ export function FloatingNav() {
         const handleScroll = () => {
             setVisible(true)
 
-            // Clear existing timeout
             if (timeoutRef.current) {
                 clearTimeout(timeoutRef.current)
             }
 
-            // Hide after 2.5 seconds of no scrolling
             timeoutRef.current = setTimeout(() => {
                 setVisible(false)
                 setExpanded(false)
@@ -51,7 +51,6 @@ export function FloatingNav() {
 
     const handleToggle = () => {
         setExpanded((prev) => !prev)
-        // Reset timeout when interacting
         if (timeoutRef.current) {
             clearTimeout(timeoutRef.current)
         }
@@ -65,7 +64,7 @@ export function FloatingNav() {
         <AnimatePresence>
             {visible && (
                 <motion.div
-                    className="floating-nav"
+                    className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-4"
                     initial={{ opacity: 0, x: 50 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 50 }}
@@ -74,7 +73,7 @@ export function FloatingNav() {
                     <AnimatePresence>
                         {expanded && (
                             <motion.div
-                                className="floating-nav__menu"
+                                className="flex flex-col gap-2 p-2 bg-background/80 backdrop-blur-md border border-border rounded-lg shadow-lg mb-2"
                                 initial={{ opacity: 0, scale: 0.9, y: 10 }}
                                 animate={{ opacity: 1, scale: 1, y: 0 }}
                                 exit={{ opacity: 0, scale: 0.9, y: 10 }}
@@ -85,27 +84,28 @@ export function FloatingNav() {
                                         key={item.path}
                                         to={item.path}
                                         className={({ isActive }) =>
-                                            `floating-nav__item ${isActive ? 'floating-nav__item--active' : ''}`
+                                            cn(
+                                                "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-muted",
+                                                isActive ? "bg-secondary text-secondary-foreground" : "text-muted-foreground"
+                                            )
                                         }
                                     >
-                                        <span className="floating-nav__icon">{item.icon}</span>
-                                        <span className="floating-nav__label">{item.label}</span>
+                                        <item.icon className="w-4 h-4" />
+                                        <span>{item.label}</span>
                                     </NavLink>
                                 ))}
                             </motion.div>
                         )}
                     </AnimatePresence>
 
-                    <button
-                        type="button"
-                        className={`floating-nav__trigger ${expanded ? 'floating-nav__trigger--open' : ''}`}
+                    <Button
+                        size="icon"
+                        className="rounded-full h-12 w-12 shadow-lg"
                         onClick={handleToggle}
                         aria-label="导航菜单"
                     >
-                        <span className="floating-nav__trigger-icon">
-                            {expanded ? '✕' : '☰'}
-                        </span>
-                    </button>
+                        {expanded ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                    </Button>
                 </motion.div>
             )}
         </AnimatePresence>

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import type { TocItem } from '../utils/markdownUtils'
-import './TableOfContents.css'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { ArrowUp } from 'lucide-react'
 
 interface TableOfContentsProps {
   headings: TocItem[]
@@ -9,7 +11,6 @@ interface TableOfContentsProps {
 export function TableOfContents({ headings }: TableOfContentsProps) {
   const [activeId, setActiveId] = useState<string>('')
 
-  // Scroll spy effect
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -33,14 +34,21 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
   if (headings.length === 0) return null
 
   return (
-    <nav className="toc" aria-label="Table of contents">
-      <div className="toc-title">目录</div>
-      <ul className="toc-list">
+    <nav className="p-4 bg-card rounded-lg border shadow-sm max-h-[calc(100vh-120px)] overflow-y-auto" aria-label="Table of contents">
+      <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4 pb-3 border-b">
+        目录
+      </div>
+      <ul className="space-y-1 m-0 list-none">
         {headings.map((heading) => (
-          <li key={heading.id} className={`toc-item toc-item--h${heading.level}`}>
+          <li key={heading.id} style={{ marginLeft: (heading.level - 2) * 12 }}>
             <a
               href={`#${heading.id}`}
-              className={`toc-link ${activeId === heading.id ? 'active' : ''}`}
+              className={cn(
+                "block text-sm py-1 px-2 rounded-md transition-all duration-200 no-underline",
+                activeId === heading.id 
+                  ? "bg-secondary text-primary font-medium shadow-sm"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              )}
               onClick={(e) => {
                 e.preventDefault()
                 const element = document.getElementById(heading.id)
@@ -48,7 +56,6 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
                   const headerOffset = 100
                   const elementPosition = element.getBoundingClientRect().top
                   const offsetPosition = elementPosition + window.pageYOffset - headerOffset
-
                   window.scrollTo({ top: offsetPosition, behavior: 'smooth' })
                   setActiveId(heading.id)
                 }
@@ -60,14 +67,15 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
         ))}
       </ul>
 
-      <div className="toc-footer">
-        <button
-          type="button"
-          className="toc-back-to-top"
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+      <div className="mt-4 pt-3 border-t">
+        <Button 
+            variant="ghost" 
+            size="sm" 
+            className="w-full justify-start text-xs text-muted-foreground hover:text-primary"
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         >
-          ← 返回顶部
-        </button>
+          <ArrowUp className="mr-2 h-3 w-3" /> 返回顶部
+        </Button>
       </div>
     </nav>
   )

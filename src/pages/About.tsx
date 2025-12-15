@@ -1,5 +1,7 @@
-import { Card, Tag, Button, Progress } from '@kzqkzq/tactile-ui'
-import './About.css'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 const skills = [
   { name: 'React / UI 工程', level: 90 },
@@ -27,88 +29,112 @@ const contacts = [
   { label: 'Twitter', value: '@kzq_dev', href: 'https://twitter.com' },
 ]
 
+// Custom Progress Component since install failed
+function ProgressBar({ value, className }: { value: number, className?: string }) {
+    return (
+        <div className={cn("h-2 w-full bg-secondary overflow-hidden rounded-full", className)}>
+            <div 
+                className="h-full bg-primary transition-all duration-500 ease-in-out" 
+                style={{ width: `${value}%` }} 
+            />
+        </div>
+    )
+}
+
 export default function About() {
   return (
-    <div className="about-page">
-      <header className="page-header">
-        <div className="page-eyebrow">About</div>
-        <h1 className="page-title">关于 KZQ</h1>
-        <p className="page-desc">
+    <div className="container mx-auto max-w-4xl py-10 space-y-8">
+      <header className="space-y-4 text-center md:text-left">
+        <Badge variant="secondary" className="mb-2">About</Badge>
+        <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">关于 KZQ</h1>
+        <p className="text-xl text-muted-foreground max-w-[700px]">
           热爱把技术与设计揉到一起，偏爱触感、柔和光影的界面，同时坚持严谨的类型与工程质量。
         </p>
       </header>
 
-      <div className="about-grid">
-        <Card className="soft-card glass-card about-profile">
-          <div className="about-avatar">👋</div>
-          <h3>前端 / 全栈开发者</h3>
-          <p className="muted">
-            关注 TypeScript、React 生态和设计系统，擅长把抽象的系统语言转化为可触摸的 UI。
-          </p>
-          <div className="about-tags">
-            <Tag variant="solid">New Neumorphism</Tag>
-            <Tag variant="solid">Type Safety</Tag>
-            <Tag variant="solid">Design Systems</Tag>
-          </div>
-          <Button
-            type="button"
-            variant="primary"
-            size="sm"
-            onClick={() => {
-              window.location.href = 'mailto:hello@example.com'
-            }}
-          >
-            开始交流
-          </Button>
-        </Card>
-
-        <Card className="soft-card about-skills">
-          <h3>技能与偏好</h3>
-          <div className="skills-list">
-            {skills.map((skill) => (
-              <div key={skill.name} className="skill-row">
-                <div className="skill-header">
-                  <span>{skill.name}</span>
-                  <span className="muted">{skill.level}%</span>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Profile Card */}
+        <Card className="flex flex-col border-border/60 shadow-sm md:col-span-1">
+            <CardHeader className="text-center pb-2">
+                <div className="text-6xl mb-4">👋</div>
+                <CardTitle>前端 / 全栈开发者</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6 text-center">
+                <p className="text-muted-foreground">
+                    关注 TypeScript、React 生态和设计系统，擅长把抽象的系统语言转化为可触摸的 UI。
+                </p>
+                <div className="flex flex-wrap justify-center gap-2">
+                    <Badge variant="outline">New Neumorphism</Badge>
+                    <Badge variant="outline">Type Safety</Badge>
+                    <Badge variant="outline">Design Systems</Badge>
                 </div>
-                <Progress value={skill.level} />
-              </div>
-            ))}
-          </div>
+                <Button 
+                    className="w-full"
+                    onClick={() => window.location.href = 'mailto:hello@example.com'}
+                >
+                    开始交流
+                </Button>
+            </CardContent>
         </Card>
 
-        <Card className="soft-card about-experience">
-          <h3>经历</h3>
-          <div className="timeline">
-            {experiences.map((item) => (
-              <div key={item.title} className="timeline-item">
-                <div className="timeline-dot" />
-                <div>
-                  <div className="timeline-period mono">{item.period}</div>
-                  <div className="timeline-title">{item.title}</div>
-                  <p className="muted">{item.detail}</p>
+        {/* Skills Card */}
+        <Card className="border-border/60 shadow-sm md:col-span-1">
+            <CardHeader>
+                <CardTitle>技能与偏好</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+                {skills.map((skill) => (
+                    <div key={skill.name} className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                            <span className="font-medium">{skill.name}</span>
+                            <span className="text-muted-foreground">{skill.level}%</span>
+                        </div>
+                        <ProgressBar value={skill.level} />
+                    </div>
+                ))}
+            </CardContent>
+        </Card>
+
+        {/* Experience Card */}
+        <Card className="border-border/60 shadow-sm md:col-span-1">
+            <CardHeader>
+                <CardTitle>经历</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <div className="space-y-8 border-l-2 border-muted ml-3 pl-6 py-2">
+                    {experiences.map((item) => (
+                        <div key={item.title} className="relative">
+                            <span className="absolute -left-[31px] top-1 h-4 w-4 rounded-full border-2 border-background bg-primary ring-2 ring-border" />
+                            <div className="flex flex-col gap-1">
+                                <span className="text-xs font-mono text-muted-foreground">{item.period}</span>
+                                <span className="font-semibold">{item.title}</span>
+                                <p className="text-sm text-muted-foreground">{item.detail}</p>
+                            </div>
+                        </div>
+                    ))}
                 </div>
-              </div>
-            ))}
-          </div>
+            </CardContent>
         </Card>
 
-        <Card className="soft-card about-contact">
-          <h3>联系我</h3>
-          <div className="contact-list">
-            {contacts.map((item) => (
-              <a
-                key={item.label}
-                href={item.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="contact-item"
-              >
-                <span className="contact-label">{item.label}</span>
-                <span className="contact-value">{item.value}</span>
-              </a>
-            ))}
-          </div>
+        {/* Contact Card */}
+        <Card className="border-border/60 shadow-sm md:col-span-1">
+            <CardHeader>
+                <CardTitle>联系我</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                {contacts.map((item) => (
+                    <a
+                        key={item.label}
+                        href={item.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 transition-colors group"
+                    >
+                        <span className="font-medium">{item.label}</span>
+                        <span className="text-muted-foreground group-hover:text-primary transition-colors">{item.value}</span>
+                    </a>
+                ))}
+            </CardContent>
         </Card>
       </div>
     </div>
