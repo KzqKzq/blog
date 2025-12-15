@@ -29,17 +29,19 @@ import {
     ResizablePanel,
     ResizableHandle,
 } from '@/components/ui/resizable'
-import { 
-    Save, 
-    ArrowLeft, 
-    Loader2, 
+import {
+    Save,
+    ArrowLeft,
+    Loader2,
     X,
     ChevronDown,
     ChevronUp,
     ChevronLeft,
     ChevronRight,
     Maximize2,
-    Minimize2
+    Minimize2,
+    Timer,
+    TimerOff
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { getTagColor } from '@/lib/utils'
@@ -61,9 +63,9 @@ import { Markdown } from 'tiptap-markdown'
 // --- Tiptap UI Primitives ---
 import { Spacer } from "@/components/tiptap-ui-primitive/spacer"
 import {
-  Toolbar,
-  ToolbarGroup,
-  ToolbarSeparator,
+    Toolbar,
+    ToolbarGroup,
+    ToolbarSeparator,
 } from "@/components/tiptap-ui-primitive/toolbar"
 
 // --- Tiptap Node Extensions ---
@@ -84,10 +86,10 @@ import { ListDropdownMenu } from "@/components/tiptap-ui/list-dropdown-menu"
 import { BlockquoteButton } from "@/components/tiptap-ui/blockquote-button"
 import { CodeBlockButton } from "@/components/tiptap-ui/code-block-button"
 import {
-  ColorHighlightPopover,
+    ColorHighlightPopover,
 } from "@/components/tiptap-ui/color-highlight-popover"
 import {
-  LinkPopover,
+    LinkPopover,
 } from "@/components/tiptap-ui/link-popover"
 import { MarkButton } from "@/components/tiptap-ui/mark-button"
 import { TextAlignButton } from "@/components/tiptap-ui/text-align-button"
@@ -107,7 +109,12 @@ export default function ArticleEditor() {
     const [isDirty, setIsDirty] = useState(false)
     const isDirtyRef = useRef(false)
     const [settingsOpen, setSettingsOpen] = useState(true)
-    
+
+    // Auto-save states
+    const [autoSaveEnabled, setAutoSaveEnabled] = useState(false)
+    const [lastAutoSave, setLastAutoSave] = useState<Date | null>(null)
+    const autoSaveIntervalRef = useRef<NodeJS.Timeout | null>(null)
+
     // Panel visibility states
     const [showEditor, setShowEditor] = useState(true)
     const [showPreview, setShowPreview] = useState(true)
@@ -120,7 +127,7 @@ export default function ArticleEditor() {
     const [coverImage, setCoverImage] = useState('')
     const [published, setPublished] = useState(false)
     const [currentTag, setCurrentTag] = useState('')
-    
+
     const [meta] = useState<Record<string, unknown>>({})
     const [previewContent, setPreviewContent] = useState<Record<string, unknown>>({})
     const [initialContent, setInitialContent] = useState<string>('')
@@ -209,6 +216,25 @@ export default function ArticleEditor() {
         return () => window.removeEventListener('beforeunload', handleBeforeUnload)
     }, [isDirty])
 
+    // Auto-save effect
+    useEffect(() => {
+        if (autoSaveEnabled && !isNew) {
+            autoSaveIntervalRef.current = setInterval(async () => {
+                if (isDirtyRef.current && !saving) {
+                    console.log('Auto-saving...')
+                    await handleAutoSave()
+                }
+            }, 60000) // 60 seconds
+        }
+
+        return () => {
+            if (autoSaveIntervalRef.current) {
+                clearInterval(autoSaveIntervalRef.current)
+                autoSaveIntervalRef.current = null
+            }
+        }
+    }, [autoSaveEnabled, isNew])
+
     const blocker = useBlocker(
         ({ currentLocation, nextLocation }) =>
             isDirty && currentLocation.pathname !== nextLocation.pathname
@@ -230,10 +256,10 @@ export default function ArticleEditor() {
             setTags(data.tags || [])
             setCoverImage(data.cover_image || '')
             setPublished(data.status === 'published' || data.published)
-            
+
             const content = data.markdown || data.content || ''
             setInitialContent(content)
-            
+
             setIsDirty(false)
         } catch (error) {
             console.error('Error fetching article:', error)
@@ -257,7 +283,7 @@ export default function ArticleEditor() {
         setSaving(true)
         try {
             const markdown = editor?.storage.markdown?.getMarkdown() || ''
-            
+
             const articleData = {
                 title,
                 slug,
@@ -289,13 +315,53 @@ export default function ArticleEditor() {
 
             toast.success('保存成功')
             setIsDirty(false)
-            
+
             if (isNew) {
                 setTimeout(() => navigate('/admin/posts'), 0)
             }
         } catch (error: unknown) {
             console.error('Error saving article:', error)
             toast.error((error as Error).message || '保存失败')
+        } finally {
+            setSaving(false)
+        }
+    }
+
+    // Auto-save function (silent save without validation toasts)
+    const handleAutoSave = async () => {
+        if (!title.trim() || !slug.trim() || isNew) {
+            return // Skip auto-save if missing required fields or new article
+        }
+
+        setSaving(true)
+        try {
+            const markdown = editor?.storage.markdown?.getMarkdown() || ''
+
+            const articleData = {
+                title,
+                slug,
+                excerpt: description,
+                content: markdown,
+                tags,
+                cover_image: coverImage,
+                status: published ? 'published' : 'draft',
+                seo_description: description,
+                updated_at: new Date().toISOString(),
+            }
+
+            const { error } = await supabase
+                .from('posts')
+                .update(articleData)
+                .eq('id', id)
+
+            if (error) throw error
+
+            setIsDirty(false)
+            setLastAutoSave(new Date())
+            toast.success('自动保存成功', { duration: 2000 })
+        } catch (error: unknown) {
+            console.error('Auto-save error:', error)
+            toast.error('自动保存失败', { duration: 2000 })
         } finally {
             setSaving(false)
         }
@@ -358,12 +424,39 @@ export default function ArticleEditor() {
                         <Label htmlFor="published-switch" className="text-sm text-muted-foreground">
                             {published ? '已发布' : '草稿'}
                         </Label>
-                        <Switch 
+                        <Switch
                             id="published-switch"
                             checked={published}
                             onCheckedChange={(checked) => handleChange(setPublished, checked)}
                         />
                     </div>
+
+                    {/* Auto-save toggle */}
+                    {!isNew && (
+                        <div className="flex items-center gap-2 mr-4 border-r pr-4">
+                            <div className="flex items-center gap-1.5">
+                                {autoSaveEnabled ? (
+                                    <Timer className="h-4 w-4 text-green-500" />
+                                ) : (
+                                    <TimerOff className="h-4 w-4 text-muted-foreground" />
+                                )}
+                                <Label htmlFor="autosave-switch" className="text-sm text-muted-foreground">
+                                    自动保存
+                                </Label>
+                            </div>
+                            <Switch
+                                id="autosave-switch"
+                                checked={autoSaveEnabled}
+                                onCheckedChange={setAutoSaveEnabled}
+                            />
+                            {autoSaveEnabled && lastAutoSave && (
+                                <span className="text-xs text-muted-foreground">
+                                    {lastAutoSave.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
+                                </span>
+                            )}
+                        </div>
+                    )}
+
                     <Button onClick={handleSave} disabled={saving}>
                         {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         <Save className="mr-2 h-4 w-4" />
@@ -384,27 +477,27 @@ export default function ArticleEditor() {
                     <div className="px-4 pb-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div className="space-y-1">
                             <Label className="text-xs text-muted-foreground">标题</Label>
-                            <Input 
-                                value={title} 
-                                onChange={(e) => handleChange(setTitle, e.target.value)} 
+                            <Input
+                                value={title}
+                                onChange={(e) => handleChange(setTitle, e.target.value)}
                                 placeholder="文章标题"
                             />
                         </div>
-                        
+
                         <div className="space-y-1">
                             <Label className="text-xs text-muted-foreground">链接别名</Label>
-                            <Input 
-                                value={slug} 
-                                onChange={(e) => handleChange(setSlug, e.target.value)} 
+                            <Input
+                                value={slug}
+                                onChange={(e) => handleChange(setSlug, e.target.value)}
                                 placeholder="url-friendly-slug"
                             />
                         </div>
 
                         <div className="space-y-1">
                             <Label className="text-xs text-muted-foreground">封面图片</Label>
-                            <Input 
-                                value={coverImage} 
-                                onChange={(e) => handleChange(setCoverImage, e.target.value)} 
+                            <Input
+                                value={coverImage}
+                                onChange={(e) => handleChange(setCoverImage, e.target.value)}
                                 placeholder="https://..."
                             />
                         </div>
@@ -412,7 +505,7 @@ export default function ArticleEditor() {
                         <div className="space-y-1">
                             <Label className="text-xs text-muted-foreground">标签</Label>
                             <div className="flex gap-2">
-                                <Input 
+                                <Input
                                     value={currentTag}
                                     onChange={(e) => setCurrentTag(e.target.value)}
                                     onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
@@ -425,9 +518,9 @@ export default function ArticleEditor() {
 
                         <div className="space-y-1 md:col-span-2 lg:col-span-3">
                             <Label className="text-xs text-muted-foreground">摘要描述</Label>
-                            <Textarea 
-                                value={description} 
-                                onChange={(e) => handleChange(setDescription, e.target.value)} 
+                            <Textarea
+                                value={description}
+                                onChange={(e) => handleChange(setDescription, e.target.value)}
                                 placeholder="SEO 描述和卡片预览..."
                                 className="h-20 resize-none"
                             />
@@ -438,8 +531,8 @@ export default function ArticleEditor() {
                                 {tags.map(tag => (
                                     <Badge key={tag} variant="secondary" className={cn("gap-1 text-xs", getTagColor(tag))}>
                                         {tag}
-                                        <X 
-                                            className="h-3 w-3 cursor-pointer hover:text-destructive" 
+                                        <X
+                                            className="h-3 w-3 cursor-pointer hover:text-destructive"
                                             onClick={() => removeTag(tag)}
                                         />
                                     </Badge>
@@ -460,10 +553,10 @@ export default function ArticleEditor() {
                                 <span className="pl-2">编辑器</span>
                                 <div className="flex gap-1">
                                     {showPreview && (
-                                        <Button 
-                                            variant="ghost" 
-                                            size="icon" 
-                                            className="h-6 w-6" 
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-6 w-6"
                                             onClick={toggleEditorOnly}
                                             title="仅显示编辑器"
                                         >
@@ -472,7 +565,7 @@ export default function ArticleEditor() {
                                     )}
                                 </div>
                             </div>
-                            
+
                             <div className="flex-1 flex flex-col overflow-hidden min-h-0">
                                 <EditorContext.Provider value={{ editor }}>
                                     <Toolbar className="shrink-0 border-b">
@@ -534,19 +627,19 @@ export default function ArticleEditor() {
                     <ResizableHandle className="relative group">
                         <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-px bg-border" />
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col gap-1 bg-background border rounded-md p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
-                            <Button 
-                                variant="ghost" 
-                                size="icon" 
-                                className="h-6 w-6" 
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6"
                                 onClick={toggleEditorOnly}
                                 title="仅显示编辑器"
                             >
                                 <ChevronLeft className="h-4 w-4" />
                             </Button>
-                            <Button 
-                                variant="ghost" 
-                                size="icon" 
-                                className="h-6 w-6" 
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6"
                                 onClick={togglePreviewOnly}
                                 title="仅显示预览"
                             >
@@ -564,10 +657,10 @@ export default function ArticleEditor() {
                                 <span className="pl-2">预览</span>
                                 <div className="flex gap-1">
                                     {showEditor && (
-                                        <Button 
-                                            variant="ghost" 
-                                            size="icon" 
-                                            className="h-6 w-6" 
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-6 w-6"
                                             onClick={togglePreviewOnly}
                                             title="仅显示预览"
                                         >
@@ -575,10 +668,10 @@ export default function ArticleEditor() {
                                         </Button>
                                     )}
                                     {(!showEditor || !showPreview) && (
-                                        <Button 
-                                            variant="ghost" 
-                                            size="icon" 
-                                            className="h-6 w-6" 
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-6 w-6"
                                             onClick={toggleBoth}
                                             title="显示两栏"
                                         >
