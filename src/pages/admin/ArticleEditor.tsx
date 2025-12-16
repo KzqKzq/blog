@@ -46,6 +46,7 @@ import {
 import { cn } from '@/lib/utils'
 import { getTagColor } from '@/lib/utils'
 import { TiptapArticleView } from '@/components/editor/TiptapArticleView'
+import { normalizeMarkdownHeadings } from '@/utils/markdownUtils'
 
 // --- Tiptap Official Simple Editor Components ---
 import { EditorContent, EditorContext, useEditor } from "@tiptap/react"
@@ -258,7 +259,9 @@ export default function ArticleEditor() {
             setPublished(data.status === 'published' || data.published)
 
             const content = data.markdown || data.content || ''
-            setInitialContent(content)
+            // Normalize markdown headings to ensure proper parsing
+            // This fixes issues where headings like '##Title' (without space) aren't recognized
+            setInitialContent(normalizeMarkdownHeadings(content))
 
             setIsDirty(false)
         } catch (error) {

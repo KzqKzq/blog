@@ -7,6 +7,7 @@ import { Typography } from "@tiptap/extension-typography"
 import { Highlight } from "@tiptap/extension-highlight"
 import { Subscript } from "@tiptap/extension-subscript"
 import { Superscript } from "@tiptap/extension-superscript"
+import { Markdown } from 'tiptap-markdown'
 import { HorizontalRule } from "@/components/tiptap-node/horizontal-rule-node/horizontal-rule-node-extension"
 import { Badge } from '@/components/ui/badge'
 import { Calendar, Clock } from 'lucide-react'
@@ -32,13 +33,13 @@ interface TiptapArticleViewProps {
     editorJson: Record<string, unknown>
 }
 
-export function TiptapArticleView({ 
-    title, 
-    excerpt, 
-    coverImage, 
-    tags = [], 
+export function TiptapArticleView({
+    title,
+    excerpt,
+    coverImage,
+    tags = [],
     createdAt,
-    editorJson 
+    editorJson
 }: TiptapArticleViewProps) {
     // Preview editor (read-only)
     const editor = useEditor({
@@ -60,6 +61,11 @@ export function TiptapArticleView({
             Typography,
             Superscript,
             Subscript,
+            Markdown.configure({
+                html: false,
+                transformPastedText: true,
+                transformCopiedText: true,
+            }),
         ],
         content: editorJson,
     })
@@ -94,9 +100,9 @@ export function TiptapArticleView({
                     {tags.length > 0 && (
                         <div className="flex flex-wrap gap-2 justify-center md:justify-start">
                             {tags.map(tag => (
-                                <Badge 
-                                    key={tag} 
-                                    variant="secondary" 
+                                <Badge
+                                    key={tag}
+                                    variant="secondary"
                                     className={cn("px-3 py-1 text-sm border-none shadow-sm", getTagColor(tag))}
                                 >
                                     {tag}
@@ -107,7 +113,7 @@ export function TiptapArticleView({
                     <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-foreground leading-tight">
                         {title || '无标题'}
                     </h1>
-                    
+
                     {excerpt && (
                         <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto md:mx-0 leading-relaxed font-light">
                             {excerpt}
@@ -130,9 +136,9 @@ export function TiptapArticleView({
                 {/* Cover Image */}
                 {coverImage && (
                     <div className="relative w-full aspect-[21/9] rounded-2xl overflow-hidden shadow-sm mb-12 bg-muted">
-                        <img 
-                            src={coverImage} 
-                            alt={title} 
+                        <img
+                            src={coverImage}
+                            alt={title}
                             className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
                         />
                     </div>

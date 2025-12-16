@@ -30,3 +30,17 @@ export function extractHeadings(markdown: string): TocItem[] {
 
   return headings
 }
+
+/**
+ * Normalize markdown headings to ensure there's always a space after # symbols.
+ * This fixes parsing issues with tiptap-markdown which requires standard markdown format.
+ * 
+ * @example
+ * `##3.标题` → `## 3.标题`
+ * `###Section` → `### Section`
+ */
+export function normalizeMarkdownHeadings(markdown: string): string {
+  // Match heading lines where # symbols are immediately followed by non-space, non-# characters
+  // This regex finds: #{1,6} not followed by space or another #
+  return markdown.replace(/^(#{1,6})([^\s#])/gm, '$1 $2')
+}
