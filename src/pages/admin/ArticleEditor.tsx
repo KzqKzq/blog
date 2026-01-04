@@ -51,6 +51,7 @@ import { normalizeMarkdownHeadings } from '@/utils/markdownUtils'
 // --- Tiptap Official Simple Editor Components ---
 import { EditorContent, EditorContext, useEditor } from "@tiptap/react"
 import { StarterKit } from "@tiptap/starter-kit"
+import { Link } from "@tiptap/extension-link"
 import { Image } from "@tiptap/extension-image"
 import { TaskItem, TaskList } from "@tiptap/extension-list"
 import { TextAlign } from "@tiptap/extension-text-align"
@@ -59,6 +60,10 @@ import { Highlight } from "@tiptap/extension-highlight"
 import { Subscript } from "@tiptap/extension-subscript"
 import { Superscript } from "@tiptap/extension-superscript"
 import { Selection } from "@tiptap/extensions"
+import { Table } from "@tiptap/extension-table"
+import { TableRow } from "@tiptap/extension-table-row"
+import { TableCell } from "@tiptap/extension-table-cell"
+import { TableHeader } from "@tiptap/extension-table-header"
 import { Markdown } from 'tiptap-markdown'
 
 // --- Tiptap UI Primitives ---
@@ -79,6 +84,7 @@ import "@/components/tiptap-node/list-node/list-node.scss"
 import "@/components/tiptap-node/image-node/image-node.scss"
 import "@/components/tiptap-node/heading-node/heading-node.scss"
 import "@/components/tiptap-node/paragraph-node/paragraph-node.scss"
+import "@/components/tiptap-node/table-node/table-node.scss"
 
 // --- Tiptap UI Components ---
 import { HeadingDropdownMenu } from "@/components/tiptap-ui/heading-dropdown-menu"
@@ -149,9 +155,28 @@ export default function ArticleEditor() {
         extensions: [
             StarterKit.configure({
                 horizontalRule: false,
-                link: {
-                    openOnClick: false,
-                    enableClickSelection: true,
+            }),
+            Link.configure({
+                openOnClick: false,
+                HTMLAttributes: {
+                    class: 'text-blue-600 underline hover:text-blue-800',
+                },
+            }),
+            Table.configure({
+                resizable: true,
+                HTMLAttributes: {
+                    class: 'border-collapse table-auto w-full',
+                },
+            }),
+            TableRow,
+            TableHeader.configure({
+                HTMLAttributes: {
+                    class: 'border border-gray-300 px-4 py-2 bg-gray-100 font-bold',
+                },
+            }),
+            TableCell.configure({
+                HTMLAttributes: {
+                    class: 'border border-gray-300 px-4 py-2',
                 },
             }),
             HorizontalRule,
@@ -175,6 +200,7 @@ export default function ArticleEditor() {
                 html: false,
                 transformPastedText: true,
                 transformCopiedText: true,
+                breaks: true, // Enable line breaks
             }),
         ],
         content: '',
@@ -200,7 +226,10 @@ export default function ArticleEditor() {
     // Set content when editor is ready and we have initial content
     useEffect(() => {
         if (editor && initialContent && !loading) {
-            editor.commands.setContent(initialContent)
+            // Use setContent with parseOptions to ensure Markdown is parsed correctly
+            editor.commands.setContent(initialContent, false, {
+                preserveWhitespace: 'full'
+            })
             setPreviewContent(editor.getJSON())
             setInitialContent('') // Clear to prevent re-setting
         }

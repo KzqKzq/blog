@@ -1,56 +1,100 @@
-.tiptap.ProseMirror {
-  --tt-inline-code-bg-color: hsl(220 14% 96%);
-  --tt-inline-code-text-color: hsl(220 13% 18%);
-  --tt-inline-code-border-color: hsl(220 13% 91%);
-  --tt-codeblock-bg: hsl(220 14% 96%);
-  --tt-codeblock-text: hsl(220 13% 18%);
-  --tt-codeblock-border: hsl(220 13% 91%);
-}
-
-.dark .tiptap.ProseMirror {
-  --tt-inline-code-bg-color: hsl(220 13% 18%);
-  --tt-inline-code-text-color: hsl(220 14% 96%);
-  --tt-inline-code-border-color: hsl(220 13% 26%);
-  --tt-codeblock-bg: hsl(220 13% 15%);
-  --tt-codeblock-text: hsl(220 14% 90%);
-  --tt-codeblock-border: hsl(220 13% 26%);
-}
-
 /* =====================
    CODE FORMATTING
    ===================== */
+
+/* Light mode: code blocks use dark background */
 .tiptap.ProseMirror {
-  // Inline code
+  // Inline code - light background
   code {
-    background-color: var(--tt-inline-code-bg-color);
-    color: var(--tt-inline-code-text-color);
-    border: 1px solid var(--tt-inline-code-border-color);
-    font-family: "JetBrains Mono NL", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    background-color: #f3f4f6;
+    color: #dc2626;
+    border: 1px solid #e5e7eb;
+    font-family: "JetBrains Mono NL", "Fira Code", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 0.875em;
     line-height: 1.4;
-    border-radius: 6px;
-    padding: 0.1em 0.2em;
+    border-radius: 4px;
+    padding: 0.15em 0.4em;
+    font-weight: 500;
   }
 
-  // Code blocks
+  // Code blocks - dark background with light text
   pre {
-    background-color: var(--tt-codeblock-bg);
-    color: var(--tt-codeblock-text);
-    border: 1px solid var(--tt-codeblock-border);
+    background-color: #1e1e2e !important;
+    color: #cdd6f4 !important;
+    border: 1px solid #313244;
     margin-top: 1.5em;
     margin-bottom: 1.5em;
-    padding: 1em;
+    padding: 1.25em;
     font-size: 0.9rem;
+    line-height: 1.6;
     border-radius: 8px;
     overflow-x: auto;
+    font-family: "JetBrains Mono NL", "Fira Code", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
     code {
-      background-color: transparent;
-      border: none;
+      background-color: transparent !important;
+      border: none !important;
       border-radius: 0;
-      -webkit-text-fill-color: inherit;
-      color: inherit;
+      color: #cdd6f4 !important;
+      -webkit-text-fill-color: #cdd6f4 !important;
       padding: 0;
+      font-weight: 400;
+      font-size: inherit;
+
+      // Reset any syntax highlighting that might interfere
+      * {
+        color: inherit !important;
+        -webkit-text-fill-color: inherit !important;
+      }
     }
   }
+}
+
+/* Dark mode: same dark background */
+.dark .tiptap.ProseMirror {
+  // Inline code - darker background
+  code {
+    background-color: #313244;
+    color: #fab387;
+    border: 1px solid #45475a;
+  }
+
+  // Code blocks - same dark theme
+  pre {
+    background-color: #11111b !important;
+    color: #cdd6f4 !important;
+    border-color: #313244;
+
+    code {
+      color: #cdd6f4 !important;
+      -webkit-text-fill-color: #cdd6f4 !important;
+    }
+  }
+}
+
+/* Override prose styles that might interfere */
+.prose pre,
+.prose-lg pre,
+.prose-slate pre,
+.dark .prose-invert pre {
+  background-color: #1e1e2e !important;
+  color: #cdd6f4 !important;
+
+  code {
+    background-color: transparent !important;
+    color: #cdd6f4 !important;
+    -webkit-text-fill-color: #cdd6f4 !important;
+
+    &::before,
+    &::after {
+      content: none !important;
+    }
+  }
+}
+
+.dark .prose pre,
+.dark .prose-lg pre,
+.dark .prose-slate pre,
+.dark .prose-invert pre {
+  background-color: #11111b !important;
 }

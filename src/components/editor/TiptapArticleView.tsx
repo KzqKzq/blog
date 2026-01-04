@@ -1,5 +1,6 @@
 import { EditorContent, useEditor } from "@tiptap/react"
 import { StarterKit } from "@tiptap/starter-kit"
+import { Link } from "@tiptap/extension-link"
 import { Image } from "@tiptap/extension-image"
 import { TaskItem, TaskList } from "@tiptap/extension-list"
 import { TextAlign } from "@tiptap/extension-text-align"
@@ -7,6 +8,10 @@ import { Typography } from "@tiptap/extension-typography"
 import { Highlight } from "@tiptap/extension-highlight"
 import { Subscript } from "@tiptap/extension-subscript"
 import { Superscript } from "@tiptap/extension-superscript"
+import { Table } from "@tiptap/extension-table"
+import { TableRow } from "@tiptap/extension-table-row"
+import { TableCell } from "@tiptap/extension-table-cell"
+import { TableHeader } from "@tiptap/extension-table-header"
 import { Markdown } from 'tiptap-markdown'
 import { HorizontalRule } from "@/components/tiptap-node/horizontal-rule-node/horizontal-rule-node-extension"
 import { Badge } from '@/components/ui/badge'
@@ -22,6 +27,7 @@ import "@/components/tiptap-node/list-node/list-node.scss"
 import "@/components/tiptap-node/image-node/image-node.scss"
 import "@/components/tiptap-node/heading-node/heading-node.scss"
 import "@/components/tiptap-node/paragraph-node/paragraph-node.scss"
+import "@/components/tiptap-node/table-node/table-node.scss"
 import "@/components/tiptap-templates/simple/simple-editor.scss"
 
 interface TiptapArticleViewProps {
@@ -52,6 +58,29 @@ export function TiptapArticleView({
         },
         extensions: [
             StarterKit.configure({ horizontalRule: false }),
+            Link.configure({
+                openOnClick: false,
+                HTMLAttributes: {
+                    class: 'text-blue-600 underline hover:text-blue-800 dark:text-blue-400',
+                },
+            }),
+            Table.configure({
+                resizable: false,
+                HTMLAttributes: {
+                    class: 'border-collapse table-auto w-full',
+                },
+            }),
+            TableRow,
+            TableHeader.configure({
+                HTMLAttributes: {
+                    class: 'border border-gray-300 dark:border-gray-600 px-4 py-2 bg-gray-100 dark:bg-gray-800 font-bold',
+                },
+            }),
+            TableCell.configure({
+                HTMLAttributes: {
+                    class: 'border border-gray-300 dark:border-gray-600 px-4 py-2',
+                },
+            }),
             HorizontalRule,
             TextAlign.configure({ types: ["heading", "paragraph"] }),
             TaskList,
@@ -65,6 +94,7 @@ export function TiptapArticleView({
                 html: false,
                 transformPastedText: true,
                 transformCopiedText: true,
+                breaks: true,
             }),
         ],
         content: editorJson,
