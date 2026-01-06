@@ -1,4 +1,4 @@
-// import { motion, useScroll, useTransform } from 'framer-motion' 
+// import { motion, useScroll, useTransform } from 'framer-motion'
 // Framer motion unused in this new layout
 import MDEditor from '@uiw/react-md-editor'
 import { Button } from '@/components/ui/button'
@@ -7,18 +7,20 @@ import { Calendar, ArrowLeft } from 'lucide-react'
 import { cn, getTagColor } from '@/lib/utils'
 import { TableOfContents } from './TableOfContents'
 import { extractHeadings } from '@/utils/markdownUtils'
+import { GiscusComments } from './GiscusComments'
 import '@/styles/markdown.css'
 
 interface ArticleViewProps {
     article: {
         title: string
+        slug?: string
         created_at: string
         tags?: string[]
         excerpt?: string
         cover_image?: string | null
     }
     content: string
-    coverImage?: string 
+    coverImage?: string
     onBack?: () => void
     previewMode?: boolean
 }
@@ -83,14 +85,21 @@ export function ArticleView({ article, content, coverImage, onBack, previewMode 
             </div>
 
             <div className="container mx-auto max-w-6xl grid grid-cols-1 lg:grid-cols-[1fr_250px] gap-12 px-4 md:px-6">
-                <article className="prose prose-lg prose-slate dark:prose-invert max-w-none">
-                     <div data-color-mode="light">
-                        <MDEditor.Markdown
-                          source={content}
-                          style={{ background: 'transparent', color: 'inherit', fontSize: '1.125rem', lineHeight: '1.8' }}
-                        />
-                     </div>
-                </article>
+                <div>
+                    <article className="prose prose-lg prose-slate dark:prose-invert max-w-none">
+                         <div data-color-mode="light">
+                            <MDEditor.Markdown
+                              source={content}
+                              style={{ background: 'transparent', color: 'inherit', fontSize: '1.125rem', lineHeight: '1.8' }}
+                            />
+                         </div>
+                    </article>
+
+                    {/* GitHub Comments */}
+                    {!previewMode && article.slug && (
+                        <GiscusComments slug={article.slug} />
+                    )}
+                </div>
 
                 <aside className="hidden lg:block relative">
                     <div className="sticky top-24">

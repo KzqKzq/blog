@@ -1,7 +1,7 @@
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Menu } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { Menu, X } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -27,6 +27,8 @@ export default function Layout() {
   const location = useLocation()
   const [isScrolled, setIsScrolled] = useState(false)
   const [open, setOpen] = useState(false)
+  const navRef = useRef<HTMLDivElement>(null)
+  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 })
 
   // Handle scroll effect for header
   useEffect(() => {
@@ -42,77 +44,94 @@ export default function Layout() {
     setOpen(false)
   }, [location.pathname])
 
+  // Update capsule indicator position
+  useEffect(() => {
+    const updateIndicator = () => {
+      if (navRef.current) {
+        const activeLink = navRef.current.querySelector(`a[href="${location.pathname}"]`) as HTMLElement
+        if (activeLink) {
+          setIndicatorStyle({
+            left: activeLink.offsetLeft,
+            width: activeLink.offsetWidth,
+          })
+        }
+      }
+    }
+
+    // Run on mount and route change
+    updateIndicator()
+    // Also run after a small delay to ensure DOM is ready
+    const timer = setTimeout(updateIndicator, 50)
+    return () => clearTimeout(timer)
+  }, [location.pathname])
+
   return (
     <div className="min-h-screen bg-background font-sans antialiased flex flex-col">
       {/* Header */}
       <header
         className={cn(
-          "sticky top-0 z-50 w-full border-b backdrop-blur transition-all duration-200",
-          isScrolled ? "bg-background/80 border-border" : "bg-transparent border-transparent"
+          "sticky top-0 z-50 w-full backdrop-blur transition-all duration-200",
+          isScrolled ? "bg-background/80 border-b border-border" : "bg-transparent"
         )}
       >
-        <div className="container flex h-14 items-center justify-between">
-          <div className="flex items-center gap-6">
-            <Link to="/" className="flex items-center space-x-2 font-bold">
-              <span className="text-xl bg-gradient-to-tr from-primary to-teal-400 bg-clip-text text-transparent">
-                KZQ
-              </span>
-              <span className="hidden md:inline-block text-sm text-muted-foreground font-medium">/ 数字工坊</span>
-            </Link>
+        <div className="container flex h-16 items-center justify-center">
+          {/* Desktop Nav - Capsule Slider */}
+          <nav
+            ref={navRef}
+            className="hidden md:flex items-center relative bg-muted/50 rounded-full p-1"
+          >
+            {/* Sliding capsule indicator */}
+            {indicatorStyle.width > 0 && (
+              <motion.div
+                className="absolute h-[calc(100%-8px)] bg-background rounded-full shadow-sm border border-border/50"
+                initial={false}
+                animate={{
+                  left: indicatorStyle.left,
+                  width: indicatorStyle.width,
+                }}
+                transition={{ type: "spring", stiffness: 350, damping: 30 }}
+              />
+            )}
 
-            {/* Desktop Nav */}
-            <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-              {navItems.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={cn(
-                    "transition-colors hover:text-primary relative",
-                    location.pathname === item.path ? "text-foreground" : "text-muted-foreground"
-                  )}
-                >
-                  {item.label}
-                  {location.pathname === item.path && (
-                    <motion.div
-                      layoutId="navbar-indicator"
-                      className="absolute -bottom-[19px] left-0 right-0 h-[2px] bg-primary"
-                      transition={{ type: "spring", bounce: 0.25, duration: 0.5 }}
-                    />
-                  )}
-                </Link>
-              ))}
-            </nav>
-          </div>
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={cn(
+                  "relative z-10 px-5 py-2 text-sm font-medium rounded-full transition-colors duration-200",
+                  location.pathname === item.path
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
 
-          <div className="flex items-center gap-2">
-            {/* Mobile Nav Sheet */}
+          {/* Mobile Nav Button */}
+          <div className="md:hidden absolute right-4">
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden">
+                <Button variant="ghost" size="icon" className="rounded-full">
                   <Menu className="h-5 w-5" />
                   <span className="sr-only">Toggle Menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="pr-0">
-                <SheetHeader className="px-1">
-                  <SheetTitle>
-                    <Link to="/" className="flex items-center space-x-2 font-bold select-none">
-                      <span className="text-xl bg-gradient-to-tr from-primary to-teal-400 bg-clip-text text-transparent">
-                        KZQ
-                      </span>
-                    </Link>
-                  </SheetTitle>
+              <SheetContent side="top" className="h-auto">
+                <SheetHeader className="sr-only">
+                  <SheetTitle>导航菜单</SheetTitle>
                 </SheetHeader>
-                <div className="flex flex-col gap-4 mt-8 mr-6">
+                <div className="flex flex-col items-center gap-2 py-4">
                   {navItems.map((item) => (
                     <Link
                       key={item.path}
                       to={item.path}
                       className={cn(
-                        "text-lg font-medium transition-colors hover:text-primary",
+                        "w-full text-center py-3 text-lg font-medium rounded-lg transition-colors",
                         location.pathname === item.path
-                          ? "text-foreground"
-                          : "text-muted-foreground"
+                          ? "bg-primary/10 text-primary"
+                          : "text-muted-foreground hover:bg-muted"
                       )}
                     >
                       {item.label}
