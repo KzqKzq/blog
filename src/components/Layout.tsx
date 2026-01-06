@@ -1,6 +1,6 @@
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Menu, X } from 'lucide-react'
+import { Menu } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/sheet'
 import { FloatingNav } from './FloatingNav'
 import { BackToTop } from './BackToTop'
+import { ThemeToggle } from './ThemeToggle'
 import { cn } from '@/lib/utils'
 
 const navItems = [
@@ -48,12 +49,22 @@ export default function Layout() {
   useEffect(() => {
     const updateIndicator = () => {
       if (navRef.current) {
-        const activeLink = navRef.current.querySelector(`a[href="${location.pathname}"]`) as HTMLElement
-        if (activeLink) {
-          setIndicatorStyle({
-            left: activeLink.offsetLeft,
-            width: activeLink.offsetWidth,
-          })
+        // Find the active nav item based on current path
+        const activeItem = navItems.find(item => {
+          if (item.path === '/') {
+            return location.pathname === '/'
+          }
+          return location.pathname.startsWith(item.path)
+        })
+
+        if (activeItem) {
+          const activeLink = navRef.current.querySelector(`a[href="${activeItem.path}"]`) as HTMLElement
+          if (activeLink) {
+            setIndicatorStyle({
+              left: activeLink.offsetLeft,
+              width: activeLink.offsetWidth,
+            })
+          }
         }
       }
     }
@@ -74,7 +85,12 @@ export default function Layout() {
           isScrolled ? "bg-background/80 border-b border-border" : "bg-transparent"
         )}
       >
-        <div className="container flex h-16 items-center justify-center">
+        <div className="container flex h-16 items-center justify-center relative">
+          {/* Theme Toggle - Left */}
+          <div className="absolute left-4">
+            <ThemeToggle />
+          </div>
+
           {/* Desktop Nav - Capsule Slider */}
           <nav
             ref={navRef}
@@ -93,20 +109,26 @@ export default function Layout() {
               />
             )}
 
-            {navItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={cn(
-                  "relative z-10 px-5 py-2 text-sm font-medium rounded-full transition-colors duration-200",
-                  location.pathname === item.path
-                    ? "text-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {item.label}
-              </Link>
-            ))}
+            {navItems.map((item) => {
+              const isActive = item.path === '/'
+                ? location.pathname === '/'
+                : location.pathname.startsWith(item.path)
+
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={cn(
+                    "relative z-10 px-5 py-2 text-sm font-medium rounded-full transition-colors duration-200",
+                    isActive
+                      ? "text-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {item.label}
+                </Link>
+              )
+            })}
           </nav>
 
           {/* Mobile Nav Button */}
@@ -123,20 +145,26 @@ export default function Layout() {
                   <SheetTitle>导航菜单</SheetTitle>
                 </SheetHeader>
                 <div className="flex flex-col items-center gap-2 py-4">
-                  {navItems.map((item) => (
-                    <Link
-                      key={item.path}
-                      to={item.path}
-                      className={cn(
-                        "w-full text-center py-3 text-lg font-medium rounded-lg transition-colors",
-                        location.pathname === item.path
-                          ? "bg-primary/10 text-primary"
-                          : "text-muted-foreground hover:bg-muted"
-                      )}
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
+                  {navItems.map((item) => {
+                    const isActive = item.path === '/'
+                      ? location.pathname === '/'
+                      : location.pathname.startsWith(item.path)
+
+                    return (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        className={cn(
+                          "w-full text-center py-3 text-lg font-medium rounded-lg transition-colors",
+                          isActive
+                            ? "bg-primary/10 text-primary"
+                            : "text-muted-foreground hover:bg-muted"
+                        )}
+                      >
+                        {item.label}
+                      </Link>
+                    )
+                  })}
                 </div>
               </SheetContent>
             </Sheet>
