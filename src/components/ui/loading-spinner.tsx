@@ -46,8 +46,8 @@ export function PageLoadingSkeleton({ count = 3 }: { count?: number }) {
     return (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: count }).map((_, i) => (
-                <div 
-                    key={i} 
+                <div
+                    key={i}
                     className="rounded-lg border bg-card p-6 space-y-4 animate-pulse"
                 >
                     <div className="h-4 bg-muted rounded w-3/4" />
@@ -58,6 +58,46 @@ export function PageLoadingSkeleton({ count = 3 }: { count?: number }) {
                     <div className="flex gap-2">
                         <div className="h-5 w-16 bg-muted rounded-full" />
                         <div className="h-5 w-12 bg-muted rounded-full" />
+                    </div>
+                </div>
+            ))}
+        </div>
+    )
+}
+
+// Blog post card skeleton
+export function BlogPostSkeleton({ count = 3 }: { count?: number }) {
+    return (
+        <div className="grid gap-6">
+            {Array.from({ length: count }).map((_, i) => (
+                <div key={i} className="rounded-lg border bg-card overflow-hidden animate-pulse">
+                    <div className="flex flex-col md:flex-row">
+                        {/* Content */}
+                        <div className="flex-1 p-6 space-y-4">
+                            {/* Meta */}
+                            <div className="flex gap-3 text-sm">
+                                <div className="h-4 w-24 bg-muted rounded" />
+                                <div className="h-4 w-20 bg-muted rounded" />
+                            </div>
+                            {/* Title */}
+                            <div className="space-y-2">
+                                <div className="h-6 bg-muted rounded w-3/4" />
+                                <div className="h-6 bg-muted rounded w-1/2" />
+                            </div>
+                            {/* Excerpt */}
+                            <div className="space-y-2">
+                                <div className="h-4 bg-muted rounded" />
+                                <div className="h-4 bg-muted rounded w-5/6" />
+                            </div>
+                            {/* Tags */}
+                            <div className="flex gap-2">
+                                <div className="h-6 w-16 bg-muted rounded-full" />
+                                <div className="h-6 w-20 bg-muted rounded-full" />
+                                <div className="h-6 w-14 bg-muted rounded-full" />
+                            </div>
+                        </div>
+                        {/* Image */}
+                        <div className="md:w-72 lg:w-80 h-48 md:h-auto bg-muted" />
                     </div>
                 </div>
             ))}

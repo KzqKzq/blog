@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button'
 import {
   LayoutDashboard,
   FileText,
-  MessageSquare,
   Settings as SettingsIcon,
   LogOut,
   User,
@@ -15,7 +14,6 @@ import { cn } from '@/lib/utils'
 const navItems = [
   { path: '/admin/dashboard', label: '仪表盘', icon: LayoutDashboard },
   { path: '/admin/posts', label: '文章管理', icon: FileText },
-  { path: '/admin/comments', label: '评论管理', icon: MessageSquare },
   { path: '/admin/homepage', label: '首页配置', icon: Home },
   { path: '/admin/settings', label: '设置', icon: SettingsIcon },
 ]

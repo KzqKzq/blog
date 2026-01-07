@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ArrowLeft } from 'lucide-react'
+import { SEO } from '@/components/SEO'
 
 import { supabase, Post } from '../lib/supabase'
 import { fetchDailyImage } from '../utils/bingImageUtils'
@@ -14,12 +15,17 @@ import '@/styles/markdown.css'
 export default function ArticlePage() {
   const { slug } = useParams<{ slug: string }>()
   const navigate = useNavigate()
+  const location = useLocation()
   const [article, setArticle] = useState<Post | null>(null)
   const [loading, setLoading] = useState(true)
   const [coverImage, setCoverImage] = useState<string | null>(null)
   const [contentMarkdown, setContentMarkdown] = useState('')
-  
-  // Parallax hooks removed as they are now in ArticleView
+  const [prevArticle, setPrevArticle] = useState<Post | null>(null)
+  const [nextArticle, setNextArticle] = useState<Post | null>(null)
+  const [relatedArticles, setRelatedArticles] = useState<Post[]>([])
+
+  // Determine the back path based on current location
+  const backPath = location.pathname.startsWith('/essays') ? '/essays' : '/blog'
 
   useEffect(() => {
     if (slug) {
@@ -48,6 +54,39 @@ export default function ArticlePage() {
         fetchDailyImage().then((url) => {
           if (url) setCoverImage(url)
         })
+      }
+
+      // Fetch adjacent articles (prev and next)
+      const { data: allPosts } = await supabase
+        .from('posts')
+        .select('id, title, slug, created_at, tags, excerpt')
+        .eq('status', 'published')
+        .order('created_at', { ascending: false })
+
+      if (allPosts) {
+        const currentIndex = allPosts.findIndex(p => p.id === data.id)
+        if (currentIndex > 0) {
+          setNextArticle(allPosts[currentIndex - 1]) // Newer article
+        }
+        if (currentIndex < allPosts.length - 1) {
+          setPrevArticle(allPosts[currentIndex + 1]) // Older article
+        }
+
+        // Find related articles based on shared tags
+        if (data.tags && data.tags.length > 0) {
+          const related = allPosts
+            .filter(p => p.id !== data.id) // Exclude current article
+            .map(p => {
+              const sharedTags = p.tags?.filter(tag => data.tags?.includes(tag)) || []
+              return { post: p, score: sharedTags.length }
+            })
+            .filter(item => item.score > 0) // Only articles with shared tags
+            .sort((a, b) => b.score - a.score) // Sort by number of shared tags
+            .slice(0, 3) // Get top 3
+            .map(item => item.post)
+
+          setRelatedArticles(related)
+        }
       }
 
     } catch (error) {
@@ -87,11 +126,25 @@ export default function ArticlePage() {
   }
 
   return (
-    <ArticleView 
-        article={article} 
-        content={contentMarkdown} 
+    <>
+      <SEO
+        title={article.title}
+        description={article.excerpt || undefined}
+        keywords={article.tags || undefined}
+        image={coverImage || article.cover_image || undefined}
+        type="article"
+        publishedTime={article.created_at}
+        modifiedTime={article.updated_at}
+      />
+      <ArticleView
+        article={article}
+        content={contentMarkdown}
         coverImage={coverImage || undefined}
-        onBack={() => navigate('/blog')} 
-    />
+        onBack={() => navigate(backPath)}
+        prevArticle={prevArticle}
+        nextArticle={nextArticle}
+        relatedArticles={relatedArticles}
+      />
+    </>
   )
 }

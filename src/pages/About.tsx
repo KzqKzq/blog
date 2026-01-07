@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { SEO } from '@/components/SEO'
 import { cn } from '@/lib/utils'
 
 const skills = [
@@ -43,7 +44,13 @@ function ProgressBar({ value, className }: { value: number, className?: string }
 
 export default function About() {
   return (
-    <div className="container mx-auto max-w-4xl py-10 space-y-8">
+    <>
+      <SEO
+        title="关于"
+        description="前端/全栈开发者 - 热爱把技术与设计揉到一起，偏爱触感、柔和光影的界面"
+        keywords={['前端开发', '全栈开发', 'React', 'TypeScript', '设计系统']}
+      />
+      <div className="container mx-auto max-w-4xl py-10 space-y-8">
       <header className="space-y-4 text-center md:text-left">
         <Badge variant="secondary" className="mb-2">About</Badge>
         <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">关于 KZQ</h1>
@@ -138,5 +145,6 @@ export default function About() {
         </Card>
       </div>
     </div>
+    </>
   )
 }

@@ -1,12 +1,20 @@
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { SEO } from '@/components/SEO'
+import { PageLoadingSkeleton } from '@/components/ui/loading-spinner'
 import { projects } from '../data/content'
 import { ExternalLink, Github, Star } from 'lucide-react'
 
 export default function Projects() {
   return (
-    <div className="container py-10 space-y-8">
+    <>
+      <SEO
+        title="作品集"
+        description="精选开源项目与个人实验，兼顾触感设计与工程可靠性"
+        keywords={['开源项目', '作品集', 'React', 'TypeScript', '前端']}
+      />
+      <div className="container py-10 space-y-8">
       <header className="space-y-4 text-center md:text-left">
         <div className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Projects</div>
         <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">作品与实验室</h1>
@@ -75,5 +83,6 @@ export default function Projects() {
         ))}
       </div>
     </div>
+    </>
   )
 }

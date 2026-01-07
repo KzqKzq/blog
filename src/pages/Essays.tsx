@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { SEO } from '@/components/SEO'
+import { PageLoadingSkeleton } from '@/components/ui/loading-spinner'
 import { essays } from '../data/content'
 import { Calendar, Clock } from 'lucide-react'
 
@@ -8,7 +10,13 @@ export default function Essays() {
   const sortedEssays = [...essays].sort((a, b) => (a.date > b.date ? -1 : 1))
 
   return (
-    <div className="container max-w-4xl py-10 space-y-8">
+    <>
+      <SEO
+        title="随笔"
+        description="一些关于节奏、阅读与个人习惯的随笔"
+        keywords={['随笔', '思考', '阅读', '个人成长']}
+      />
+      <div className="container max-w-4xl py-10 space-y-8">
       <header className="space-y-4 text-center md:text-left">
         <Badge variant="secondary" className="mb-2">Essays</Badge>
         <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">松弛与思考</h1>
@@ -44,5 +52,6 @@ export default function Essays() {
         ))}
       </div>
     </div>
+    </>
   )
 }
