@@ -81,10 +81,18 @@
     text-decoration: underline !important;
 }
 
-.wmde-markdown pre {
-    background-color: #282c34 !important;
+div[data-color-mode*='light'] .wmde-markdown pre {
+    background-color: #f6f8fa !important;
     border-radius: var(--radius-md) !important;
     box-shadow: var(--shadow-pressed);
+    border: 1px solid var(--color-border);
+}
+
+.wmde-markdown pre {
+    background-color: #f6f8fa !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: var(--shadow-pressed);
+    border: 1px solid var(--color-border);
 }
 
 .wmde-markdown code {

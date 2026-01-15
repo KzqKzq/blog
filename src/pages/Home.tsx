@@ -38,7 +38,7 @@ export default function Home() {
         description="个人状态、项目进度与学习追踪仪表板"
         keywords={['个人博客', '仪表板', '项目进度', '技术追踪']}
       />
-      <div className="flex flex-col gap-6 p-1">
+      <div className="container mx-auto flex flex-col gap-6 px-4 md:px-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">仪表板</h1>

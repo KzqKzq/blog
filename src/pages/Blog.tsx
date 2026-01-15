@@ -116,11 +116,6 @@ export default function Blog() {
   if (loading) {
     return (
       <div className="container max-w-5xl py-10 space-y-8">
-        <div className="space-y-4 text-center md:text-left">
-          <Badge variant="secondary" className="mb-2">Writing</Badge>
-          <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">技术写作与模式实验</h1>
-          <p className="text-xl text-muted-foreground">技术博客加载中...</p>
-        </div>
         <BlogPostSkeleton count={6} />
       </div>
     )
