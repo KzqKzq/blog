@@ -25,7 +25,7 @@ export default function Projects() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {projects.map((project) => (
-          <Card key={project.id} className="flex flex-col h-full hover:shadow-lg transition-shadow duration-300">
+          <Card key={project.id} className="flex flex-col h-full glass-card">
             <CardHeader>
               <div className="flex justify-between items-start mb-2">
                  <Badge variant="outline" className="font-mono text-xs">{project.accent || 'Lab'}</Badge>
@@ -63,10 +63,10 @@ export default function Projects() {
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full"
+                className="w-full glass-button"
                 onClick={() => window.open(project.link, '_blank', 'noopener,noreferrer')}
               >
-                <Github className="w-4 h-4 mr-2" /> Source
+                <Github className="w-4 h-4 mr-2" /> 源码
               </Button>
               {project.demo && (
                 <Button
@@ -75,7 +75,7 @@ export default function Projects() {
                   className="w-full"
                   onClick={() => window.open(project.demo!, '_blank', 'noopener,noreferrer')}
                 >
-                  <ExternalLink className="w-4 h-4 mr-2" /> Demo
+                  <ExternalLink className="w-4 h-4 mr-2" /> 演示
                 </Button>
               )}
             </CardFooter>

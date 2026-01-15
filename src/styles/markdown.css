@@ -47,14 +47,16 @@
     color: var(--color-ink) !important;
 }
 
-/* Preview Styles */
+/* Glassmorphism optimized prose styles */
 .wmde-markdown {
     font-family: var(--font-sans) !important;
     background-color: transparent !important;
     color: var(--color-ink) !important;
     line-height: 1.8 !important;
+    font-size: 1.05rem !important; /* Slightly larger for readability */
 }
 
+/* Headings */
 .wmde-markdown h1,
 .wmde-markdown h2,
 .wmde-markdown h3,
@@ -62,52 +64,97 @@
     font-family: var(--font-display);
     border-bottom: none !important;
     color: var(--color-ink);
+    margin-top: 2em !important;
+    margin-bottom: 1em !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.02em;
 }
 
+/* Paragraphs */
+.wmde-markdown p {
+    margin-bottom: 1.5em !important;
+    color: var(--color-ink);
+    opacity: 0.9; /* Slight opacity for better blending */
+}
+
+/* Blockquotes - Glass Style */
 .wmde-markdown blockquote {
     border-left: 4px solid var(--color-brand) !important;
-    background-color: rgba(20, 184, 166, 0.05) !important;
-    color: var(--color-muted) !important;
-    padding: 1em !important;
-    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.05) !important; /* Light glass */
+    backdrop-filter: blur(4px);
+    color: var(--color-ink) !important;
+    padding: 1em 1.5em !important;
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    margin: 1.5em 0 !important;
+    font-style: italic;
 }
 
+.dark .wmde-markdown blockquote {
+    background: rgba(0, 0, 0, 0.2) !important; /* Dark glass */
+}
+
+/* Links */
 .wmde-markdown a {
     color: var(--color-brand) !important;
     text-decoration: none !important;
+    border-bottom: 1px solid transparent;
+    transition: all 0.2s;
+    font-weight: 500;
 }
 
 .wmde-markdown a:hover {
-    text-decoration: underline !important;
+    border-bottom-color: var(--color-brand);
+    opacity: 0.8;
 }
 
-div[data-color-mode*='light'] .wmde-markdown pre {
-    background-color: #f6f8fa !important;
-    border-radius: var(--radius-md) !important;
-    box-shadow: var(--shadow-pressed);
+/* Lists */
+.wmde-markdown ul,
+.wmde-markdown ol {
+    padding-left: 1.5em !important;
+    margin-bottom: 1.5em !important;
+}
+
+.wmde-markdown li {
+    margin-bottom: 0.5em !important;
+}
+
+/* Tables - Glass Style */
+.wmde-markdown table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 2em 0;
+    border-radius: var(--radius-md);
+    overflow: hidden;
     border: 1px solid var(--color-border);
+    background: rgba(255, 255, 255, 0.03);
 }
 
-.wmde-markdown pre {
-    background-color: #f6f8fa !important;
-    border-radius: var(--radius-md) !important;
-    box-shadow: var(--shadow-pressed);
-    border: 1px solid var(--color-border);
+.wmde-markdown th {
+    background: rgba(0, 0, 0, 0.05);
+    padding: 0.75em 1em;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 1px solid var(--color-border);
 }
 
-.wmde-markdown code {
-    background-color: rgba(0, 0, 0, 0.05) !important;
-    color: var(--color-ink) !important;
-    padding: 0.2em 0.4em !important;
-    border-radius: 4px !important;
+.dark .wmde-markdown th {
+    background: rgba(255, 255, 255, 0.05);
 }
 
-.wmde-markdown pre code {
-    background-color: transparent !important;
-    color: inherit !important;
+.wmde-markdown td {
+    padding: 0.75em 1em;
+    border-bottom: 1px solid var(--color-border);
 }
 
+.wmde-markdown tr:last-child td {
+    border-bottom: none;
+}
+
+/* Image styling is handled by ZoomImage component, but keep fallback */
 .wmde-markdown img {
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-glass);
+    max-width: 100%;
+    height: auto;
 }

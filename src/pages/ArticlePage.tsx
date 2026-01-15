@@ -20,9 +20,9 @@ export default function ArticlePage() {
   const [loading, setLoading] = useState(true)
   const [coverImage, setCoverImage] = useState<string | null>(null)
   const [contentMarkdown, setContentMarkdown] = useState('')
-  const [prevArticle, setPrevArticle] = useState<Post | null>(null)
-  const [nextArticle, setNextArticle] = useState<Post | null>(null)
-  const [relatedArticles, setRelatedArticles] = useState<Post[]>([])
+  const [prevArticle, setPrevArticle] = useState<Partial<Post> | null>(null)
+  const [nextArticle, setNextArticle] = useState<Partial<Post> | null>(null)
+  const [relatedArticles, setRelatedArticles] = useState<Partial<Post>[]>([])
 
   // Determine the back path based on current location
   const backPath = location.pathname.startsWith('/essays') ? '/essays' : '/blog'
@@ -77,7 +77,7 @@ export default function ArticlePage() {
           const related = allPosts
             .filter(p => p.id !== data.id) // Exclude current article
             .map(p => {
-              const sharedTags = p.tags?.filter(tag => data.tags?.includes(tag)) || []
+              const sharedTags = p.tags?.filter((tag: string) => data.tags?.includes(tag)) || []
               return { post: p, score: sharedTags.length }
             })
             .filter(item => item.score > 0) // Only articles with shared tags

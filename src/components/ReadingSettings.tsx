@@ -91,12 +91,12 @@ export function ReadingSettings() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2">
+        <Button variant="outline" size="sm" className="gap-2 glass-button">
           <Settings2 className="h-4 w-4" />
           阅读设置
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80" align="end">
+      <PopoverContent className="w-80 glass" align="end">
         <div className="space-y-6">
           <div>
             <h4 className="font-medium mb-4">阅读设置</h4>

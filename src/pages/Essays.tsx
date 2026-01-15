@@ -28,7 +28,7 @@ export default function Essays() {
       <div className="grid gap-6">
         {sortedEssays.map((essay) => (
           <Link key={essay.id} to={`/essays/${essay.slug}`}>
-            <Card className="group hover:bg-muted/50 transition-colors duration-200 border-border/60">
+            <Card className="group glass-card transition-colors duration-200">
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-4 text-xs text-muted-foreground font-mono mb-2">
                   <span className="flex items-center gap-1">

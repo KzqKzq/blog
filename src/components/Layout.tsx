@@ -77,7 +77,7 @@ export default function Layout() {
   }, [location.pathname])
 
   return (
-    <div className="min-h-screen bg-background font-sans antialiased flex flex-col">
+    <div className="min-h-screen bg-transparent font-sans antialiased flex flex-col">
       {/* Header */}
       <header
         className={cn(

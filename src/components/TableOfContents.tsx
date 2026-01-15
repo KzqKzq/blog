@@ -34,8 +34,8 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
   if (headings.length === 0) return null
 
   return (
-    <nav className="p-4 bg-card rounded-lg border shadow-sm max-h-[calc(100vh-120px)] overflow-y-auto" aria-label="Table of contents">
-      <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4 pb-3 border-b">
+    <nav className="p-4 glass rounded-lg max-h-[calc(100vh-120px)] overflow-y-auto" aria-label="Table of contents">
+      <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4 pb-3 border-b border-border/10">
         目录
       </div>
       <ul className="space-y-1 m-0 list-none">
@@ -46,8 +46,8 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
               className={cn(
                 "block text-sm py-1 px-2 rounded-md transition-all duration-200 no-underline",
                 activeId === heading.id 
-                  ? "bg-secondary text-primary font-medium shadow-sm"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  ? "bg-primary/10 text-primary font-medium shadow-sm"
+                  : "text-muted-foreground hover:text-foreground hover:bg-white/5"
               )}
               onClick={(e) => {
                 e.preventDefault()

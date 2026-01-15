@@ -18,13 +18,12 @@ import { ReadingSettings } from './ReadingSettings'
 import { ShareButton } from './ShareButton'
 import '@/styles/markdown.css'
 
-interface Post {
-    id?: string
-    slug: string
-    title: string
-    excerpt?: string
-    tags?: string[]
-}
+import { Post } from '@/lib/supabase'
+
+import { CodeBlock } from './CodeBlock'
+import { ZoomImage } from './ZoomImage'
+
+import { LikeButton } from './LikeButton'
 
 interface ArticleViewProps {
     article: {
@@ -39,9 +38,9 @@ interface ArticleViewProps {
     coverImage?: string
     onBack?: () => void
     previewMode?: boolean
-    prevArticle?: { slug: string; title: string } | null
-    nextArticle?: { slug: string; title: string } | null
-    relatedArticles?: Post[]
+    prevArticle?: Partial<Post> | null
+    nextArticle?: Partial<Post> | null
+    relatedArticles?: Partial<Post>[]
 }
 
 export function ArticleView({ article, content, coverImage, onBack, previewMode = false, prevArticle, nextArticle, relatedArticles }: ArticleViewProps) {
@@ -88,7 +87,7 @@ export function ArticleView({ article, content, coverImage, onBack, previewMode 
     })()
 
     return (
-        <div className="min-h-screen pb-20 bg-background font-sans">
+        <div className="min-h-screen pb-20 bg-transparent font-sans">
             <ReadingProgress />
              
             {/* Main Layout Container */}
@@ -178,6 +177,7 @@ export function ArticleView({ article, content, coverImage, onBack, previewMode 
                                 {!previewMode && (
                                     <>
                                         <ReadingSettings />
+                                        <LikeButton articleId={article.slug} />
                                         <ShareButton title={article.title} />
                                     </>
                                 )}
@@ -188,6 +188,7 @@ export function ArticleView({ article, content, coverImage, onBack, previewMode 
                         {!previewMode && headings.length === 0 && (
                             <div className="xl:hidden mb-6 flex gap-2">
                                 <ReadingSettings />
+                                <LikeButton articleId={article.slug} />
                                 <ShareButton title={article.title} />
                             </div>
                         )}
@@ -198,6 +199,10 @@ export function ArticleView({ article, content, coverImage, onBack, previewMode 
                                 <MDEditor.Markdown
                                   source={processedContent}
                                   style={{ background: 'transparent', color: 'inherit' }}
+                                  components={{
+                                    code: CodeBlock,
+                                    img: ZoomImage
+                                  }}
                                 />
                              </div>
                         </article>
@@ -218,7 +223,7 @@ export function ArticleView({ article, content, coverImage, onBack, previewMode 
                                     {relatedArticles.map((relatedPost) => (
                                         <Card
                                             key={relatedPost.id || relatedPost.slug}
-                                            className="p-4 cursor-pointer hover:shadow-lg transition-shadow group"
+                                            className="p-4 cursor-pointer glass-card group"
                                             onClick={() => navigate(`/blog/${relatedPost.slug}`)}
                                         >
                                             <div className="space-y-3">
@@ -255,7 +260,7 @@ export function ArticleView({ article, content, coverImage, onBack, previewMode 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12 pt-8 border-t">
                                 {prevArticle ? (
                                     <Card
-                                        className="p-4 cursor-pointer hover:shadow-lg transition-shadow group"
+                                        className="p-4 cursor-pointer glass-card group"
                                         onClick={() => navigate(`/blog/${prevArticle.slug}`)}
                                     >
                                         <div className="flex items-start gap-3">
@@ -274,7 +279,7 @@ export function ArticleView({ article, content, coverImage, onBack, previewMode 
 
                                 {nextArticle && (
                                     <Card
-                                        className="p-4 cursor-pointer hover:shadow-lg transition-shadow group"
+                                        className="p-4 cursor-pointer glass-card group"
                                         onClick={() => navigate(`/blog/${nextArticle.slug}`)}
                                     >
                                         <div className="flex items-start gap-3">
@@ -298,6 +303,7 @@ export function ArticleView({ article, content, coverImage, onBack, previewMode 
                             {!previewMode && (
                                 <div className="flex gap-2">
                                     <ReadingSettings />
+                                    <LikeButton articleId={article.slug} />
                                     <ShareButton title={article.title} />
                                 </div>
                             )}

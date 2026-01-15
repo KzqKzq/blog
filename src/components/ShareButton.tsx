@@ -50,12 +50,12 @@ export function ShareButton({ title, url }: ShareButtonProps) {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2">
+        <Button variant="outline" size="sm" className="gap-2 glass-button">
           <Share2 className="h-4 w-4" />
           分享
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-72" align="end">
+      <PopoverContent className="w-72 glass" align="end">
         <div className="space-y-4">
           <div>
             <h4 className="font-medium mb-3">分享文章</h4>
@@ -82,7 +82,7 @@ export function ShareButton({ title, url }: ShareButtonProps) {
               Facebook
             </Button>
 
-            {navigator.share && (
+            {typeof navigator.share === 'function' && (
               <Button
                 variant="outline"
                 size="sm"

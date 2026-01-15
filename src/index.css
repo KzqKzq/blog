@@ -16,11 +16,12 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 47.4% 11.2%;
 
-    /* Brand Color: #14b8a6 (Teal 500) -> HSL 173 80% 40% (approx) */
-    --primary: 173 80% 40%;
+    /* Brand Color: Ethereal Cyan */
+    --primary: 190 90% 40%;
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 210 40% 96.1%;
+    /* Secondary: Soft Violet */
+    --secondary: 250 80% 96%;
     --secondary-foreground: 222.2 47.4% 11.2%;
 
     --muted: 210 40% 96.1%;
@@ -34,13 +35,12 @@
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 173 80% 40%;
+    --ring: 190 90% 40%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem; /* Increased radius for glass feel */
 
-    /* Custom Variables from previous design preserved */
-    --font-display: 'Averia Gruesa Libre', 'Inter', system-ui, sans-serif;
-    --font-sans: 'Inter', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+    --font-display: 'Outfit', 'Inter', system-ui, sans-serif;
+    --font-sans: 'Inter', 'PingFang SC', system-ui, sans-serif;
   }
 
   .dark {
@@ -53,8 +53,9 @@
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 173 80% 40%;
-    --primary-foreground: 210 40% 98%;
+    /* Brand Color: Neon Cyan */
+    --primary: 190 80% 50%;
+    --primary-foreground: 222.2 47.4% 11.2%;
 
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
@@ -70,7 +71,7 @@
 
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 173 80% 40%;
+    --ring: 190 80% 50%;
   }
 }
 
@@ -78,12 +79,59 @@
   * {
     @apply border-border;
   }
+  
   body {
-    @apply bg-background text-foreground;
+    @apply min-h-screen bg-background text-foreground font-sans antialiased;
+    background-attachment: fixed;
+    background-size: 200% 200%;
+    animation: gradient-move 20s ease infinite;
+  }
+
+  /* Light Mode Fluid Gradient - Coordinated with Cyan/Violet */
+  :root body {
+    background-image: 
+      radial-gradient(circle at 0% 0%, hsla(190, 80%, 90%, 0.5) 0%, transparent 50%),
+      radial-gradient(circle at 100% 0%, hsla(250, 70%, 92%, 0.5) 0%, transparent 50%),
+      radial-gradient(circle at 100% 100%, hsla(320, 70%, 92%, 0.5) 0%, transparent 50%),
+      radial-gradient(circle at 0% 100%, hsla(160, 70%, 90%, 0.5) 0%, transparent 50%);
+    background-color: #f8fafc; /* Slate-50 base */
+  }
+
+  /* Dark Mode Fluid Gradient - Coordinated with Cyan/Violet */
+  .dark body {
+    background-image: 
+      radial-gradient(circle at 0% 0%, hsla(190, 80%, 20%, 0.3) 0%, transparent 50%),
+      radial-gradient(circle at 100% 0%, hsla(260, 70%, 25%, 0.3) 0%, transparent 50%),
+      radial-gradient(circle at 100% 100%, hsla(320, 70%, 20%, 0.3) 0%, transparent 50%),
+      radial-gradient(circle at 0% 100%, hsla(160, 70%, 20%, 0.3) 0%, transparent 50%);
+    background-color: #020617; /* Slate-950 base */
   }
   
-  /* Typography defaults */
   h1, h2, h3, h4, h5, h6 {
     @apply font-display scroll-m-20 tracking-tight;
+  }
+}
+
+@keyframes gradient-move {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/40 dark:bg-slate-900/50 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-lg transition-all duration-300;
+  }
+  
+  .glass-card {
+    @apply bg-white/50 dark:bg-slate-900/40 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-xl hover:shadow-2xl transition-all duration-300 hover:bg-white/60 dark:hover:bg-slate-900/60;
+  }
+
+  .glass-button {
+    @apply bg-white/20 dark:bg-white/5 backdrop-blur-md border border-white/20 hover:bg-white/30 dark:hover:bg-white/10 active:scale-95 transition-all;
+  }
+
+  .glass-input {
+    @apply bg-white/20 dark:bg-white/5 backdrop-blur-sm border border-white/20 focus:bg-white/30 dark:focus:bg-white/10 transition-all outline-none ring-offset-0 focus:ring-2 focus:ring-primary/50;
   }
 }

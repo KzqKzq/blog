@@ -61,7 +61,7 @@ export default function About() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Profile Card */}
-        <Card className="flex flex-col border-border/60 shadow-sm md:col-span-1">
+        <Card className="flex flex-col glass-card md:col-span-1">
             <CardHeader className="text-center pb-2">
                 <div className="text-6xl mb-4">👋</div>
                 <CardTitle>前端 / 全栈开发者</CardTitle>
@@ -71,9 +71,9 @@ export default function About() {
                     关注 TypeScript、React 生态和设计系统，擅长把抽象的系统语言转化为可触摸的 UI。
                 </p>
                 <div className="flex flex-wrap justify-center gap-2">
-                    <Badge variant="outline">New Neumorphism</Badge>
-                    <Badge variant="outline">Type Safety</Badge>
-                    <Badge variant="outline">Design Systems</Badge>
+                    <Badge variant="outline">新拟态</Badge>
+                    <Badge variant="outline">类型安全</Badge>
+                    <Badge variant="outline">设计系统</Badge>
                 </div>
                 <Button 
                     className="w-full"
@@ -85,7 +85,7 @@ export default function About() {
         </Card>
 
         {/* Skills Card */}
-        <Card className="border-border/60 shadow-sm md:col-span-1">
+        <Card className="glass-card md:col-span-1">
             <CardHeader>
                 <CardTitle>技能与偏好</CardTitle>
             </CardHeader>
@@ -103,7 +103,7 @@ export default function About() {
         </Card>
 
         {/* Experience Card */}
-        <Card className="border-border/60 shadow-sm md:col-span-1">
+        <Card className="glass-card md:col-span-1">
             <CardHeader>
                 <CardTitle>经历</CardTitle>
             </CardHeader>
@@ -124,7 +124,7 @@ export default function About() {
         </Card>
 
         {/* Contact Card */}
-        <Card className="border-border/60 shadow-sm md:col-span-1">
+        <Card className="glass-card md:col-span-1">
             <CardHeader>
                 <CardTitle>联系我</CardTitle>
             </CardHeader>
@@ -135,7 +135,7 @@ export default function About() {
                         href={item.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 transition-colors group"
+                        className="flex items-center justify-between p-3 rounded-lg border border-transparent hover:bg-muted/50 transition-colors group"
                     >
                         <span className="font-medium">{item.label}</span>
                         <span className="text-muted-foreground group-hover:text-primary transition-colors">{item.value}</span>

@@ -198,7 +198,7 @@ export default function Blog() {
         <div className="grid gap-6">
           {paginatedPosts.map((post) => (
             <Link key={post.id} to={`/blog/${post.slug}`}>
-              <Card className="group overflow-hidden hover:shadow-xl transition-all duration-300 border-border/60 hover:border-primary/30">
+              <Card className="group overflow-hidden glass-card transition-all duration-300 hover:shadow-2xl">
                 <div className="flex flex-col md:flex-row">
                   {/* Left: Content */}
                   <div className="flex-1 p-6 flex flex-col justify-between">
@@ -233,7 +233,7 @@ export default function Blog() {
                           key={tag}
                           variant="secondary"
                           className={cn(
-                            "transition-all duration-200 hover:scale-105 cursor-pointer",
+                            "transition-all duration-200 hover:scale-105 cursor-pointer bg-secondary/50",
                             getTagColor(tag)
                           )}
                           onClick={(e) => {
@@ -249,7 +249,7 @@ export default function Blog() {
                   </div>
 
                   {/* Right: Image */}
-                  <div className="md:w-72 lg:w-80 h-48 md:h-auto relative overflow-hidden bg-muted">
+                  <div className="md:w-72 lg:w-80 h-48 md:h-auto relative overflow-hidden bg-muted/50">
                     <img
                       src={post.cover_image || getRandomImage(post.slug || post.id)}
                       alt={post.title}
@@ -265,7 +265,7 @@ export default function Blog() {
           ))}
 
           {paginatedPosts.length === 0 && (
-            <div className="text-center py-20 text-muted-foreground bg-muted/20 rounded-lg border border-dashed">
+            <div className="text-center py-20 text-muted-foreground bg-muted/20 rounded-lg border border-dashed border-white/20">
               {searchQuery || selectedTag ? '没有找到匹配的文章' : '暂无文章'}
             </div>
           )}
