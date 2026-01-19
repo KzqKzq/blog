@@ -23,6 +23,8 @@ export type Article = {
     updated_at: string
 }
 
+import { MindMapNode } from '@/lib/ai'
+
 // Admin Dashboard Types
 export type Post = {
   id: string
@@ -39,7 +41,12 @@ export type Post = {
   seo_description?: string
   created_at: string
   updated_at: string
+  ai_critique?: {
+      summary: string
+      mindmap: MindMapNode
+  } | null
 }
+
 
 export type Comment = {
   id: string

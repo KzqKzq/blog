@@ -29,6 +29,8 @@ import "@/components/tiptap-node/heading-node/heading-node.scss"
 import "@/components/tiptap-node/paragraph-node/paragraph-node.scss"
 import "@/components/tiptap-node/table-node/table-node.scss"
 import "@/components/tiptap-templates/simple/simple-editor.scss"
+import { AICritique } from '@/components/AICritique'
+import { MindMapNode } from '@/lib/ai'
 
 interface TiptapArticleViewProps {
     title: string
@@ -37,6 +39,7 @@ interface TiptapArticleViewProps {
     tags?: string[]
     createdAt?: string
     editorJson: Record<string, unknown>
+    aiCritique?: { summary: string, mindmap: MindMapNode } | null
 }
 
 export function TiptapArticleView({
@@ -45,7 +48,8 @@ export function TiptapArticleView({
     coverImage,
     tags = [],
     createdAt,
-    editorJson
+    editorJson,
+    aiCritique
 }: TiptapArticleViewProps) {
     // Preview editor (read-only)
     const editor = useEditor({
@@ -176,6 +180,10 @@ export function TiptapArticleView({
             </div>
 
             <div className="container mx-auto max-w-4xl px-4 md:px-6">
+                {aiCritique && (
+                    <AICritique data={aiCritique} />
+                )}
+
                 {/* Article Content */}
                 <article className="prose prose-lg prose-slate dark:prose-invert max-w-none">
                     <EditorContent editor={editor} />

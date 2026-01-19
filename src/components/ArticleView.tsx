@@ -24,6 +24,8 @@ import { CodeBlock } from './CodeBlock'
 import { ZoomImage } from './ZoomImage'
 
 import { LikeButton } from './LikeButton'
+import { AICritique } from './AICritique'
+import { MindMapNode } from '@/lib/ai'
 
 interface ArticleViewProps {
     article: {
@@ -33,6 +35,7 @@ interface ArticleViewProps {
         tags?: string[]
         excerpt?: string
         cover_image?: string | null
+        ai_critique?: { summary: string, mindmap: MindMapNode } | null
     }
     content: string
     coverImage?: string
@@ -58,7 +61,7 @@ export function ArticleView({ article, content, coverImage, onBack, previewMode 
     // The content often starts with the same title (H1) and excerpt that we display in header
     const processedContent = (() => {
         let result = content.trim()
-        
+
         // Remove the first H1 if it matches the article title
         const h1Match = result.match(/^#\s+(.+?)[\r\n]+/)
         if (h1Match) {
@@ -67,7 +70,7 @@ export function ArticleView({ article, content, coverImage, onBack, previewMode 
                 result = result.slice(h1Match[0].length).trim()
             }
         }
-        
+
         // Remove the first paragraph if it matches the excerpt
         if (article.excerpt) {
             const firstParaMatch = result.match(/^([^\n#]+?)[\r\n]+/)
@@ -75,21 +78,21 @@ export function ArticleView({ article, content, coverImage, onBack, previewMode 
                 const firstPara = firstParaMatch[1].trim().replace(/\*\*/g, '').replace(/\*/g, '')
                 const excerptClean = article.excerpt.trim().replace(/\*\*/g, '').replace(/\*/g, '')
                 // Check if they're similar (first 50 chars match or high overlap)
-                if (firstPara.slice(0, 50) === excerptClean.slice(0, 50) || 
+                if (firstPara.slice(0, 50) === excerptClean.slice(0, 50) ||
                     excerptClean.includes(firstPara.slice(0, 30)) ||
                     firstPara.includes(excerptClean.slice(0, 30))) {
                     result = result.slice(firstParaMatch[0].length).trim()
                 }
             }
         }
-        
+
         return result
     })()
 
     return (
         <div className="min-h-screen pb-20 bg-transparent font-sans">
             <ReadingProgress />
-             
+
             {/* Main Layout Container */}
             <div className="w-full max-w-6xl mx-auto px-4 md:px-6 pt-10">
                 <div className="flex gap-12">
@@ -102,14 +105,14 @@ export function ArticleView({ article, content, coverImage, onBack, previewMode 
                                 <ArrowLeft className="mr-2 h-4 w-4" /> 返回列表
                             </Button>
                         )}
-                        
+
                         {/* Title Section */}
                         <div className="space-y-6 mb-8 text-center md:text-left">
                             <div className="flex flex-wrap gap-2 justify-center md:justify-start">
                                 {article.tags && article.tags.map(tag => (
-                                    <Badge 
-                                        key={tag} 
-                                        variant="secondary" 
+                                    <Badge
+                                        key={tag}
+                                        variant="secondary"
                                         className={cn("px-3 py-1 text-sm border-none shadow-sm", getTagColor(tag))}
                                     >
                                         {tag}
@@ -119,7 +122,7 @@ export function ArticleView({ article, content, coverImage, onBack, previewMode 
                             <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground leading-tight">
                                 {article.title}
                             </h1>
-                            
+
                             {article.excerpt && (
                                 <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto md:mx-0 leading-relaxed font-light">
                                     {article.excerpt}
@@ -147,9 +150,9 @@ export function ArticleView({ article, content, coverImage, onBack, previewMode 
                         {/* Cover Image */}
                         {activeCover && (
                             <div className="relative w-full aspect-[21/9] rounded-2xl overflow-hidden shadow-sm mb-12 bg-muted">
-                                <img 
-                                    src={activeCover} 
-                                    alt={article.title} 
+                                <img
+                                    src={activeCover}
+                                    alt={article.title}
                                     className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
                                 />
                             </div>
@@ -193,18 +196,23 @@ export function ArticleView({ article, content, coverImage, onBack, previewMode 
                             </div>
                         )}
 
+                        {/* AI Critique Section */}
+                        {article.ai_critique && (
+                            <AICritique data={article.ai_critique} />
+                        )}
+
                         {/* Article Content */}
                         <article className="prose prose-lg prose-slate dark:prose-invert max-w-none">
-                             <div data-color-mode="light">
+                            <div data-color-mode="light">
                                 <MDEditor.Markdown
-                                  source={processedContent}
-                                  style={{ background: 'transparent', color: 'inherit' }}
-                                  components={{
-                                    code: CodeBlock,
-                                    img: ZoomImage
-                                  }}
+                                    source={processedContent}
+                                    style={{ background: 'transparent', color: 'inherit' }}
+                                    components={{
+                                        code: CodeBlock,
+                                        img: ZoomImage
+                                    }}
                                 />
-                             </div>
+                            </div>
                         </article>
 
                         {/* GitHub Comments */}

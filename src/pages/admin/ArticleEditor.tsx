@@ -41,7 +41,8 @@ import {
     Maximize2,
     Minimize2,
     Timer,
-    TimerOff
+    TimerOff,
+    Sparkles
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { getTagColor } from '@/lib/utils'
@@ -108,6 +109,8 @@ import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils"
 // --- Tiptap Styles ---
 import "@/components/tiptap-templates/simple/simple-editor.scss"
 
+import { generateArticleCritique, MindMapNode } from '@/lib/ai'
+
 export default function ArticleEditor() {
     const { id } = useParams()
     const navigate = useNavigate()
@@ -134,6 +137,8 @@ export default function ArticleEditor() {
     const [coverImage, setCoverImage] = useState('')
     const [published, setPublished] = useState(false)
     const [currentTag, setCurrentTag] = useState('')
+    const [generatingAI, setGeneratingAI] = useState(false)
+    const [aiCritique, setAiCritique] = useState<{ summary: string, mindmap: MindMapNode } | null>(null)
 
     const [meta] = useState<Record<string, unknown>>({})
     const [previewContent, setPreviewContent] = useState<Record<string, unknown>>({})
@@ -270,6 +275,31 @@ export default function ArticleEditor() {
             isDirty && currentLocation.pathname !== nextLocation.pathname
     );
 
+    const generateAICritique = async () => {
+        if (!editor) return
+        setGeneratingAI(true)
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const markdown = editor.storage.markdown?.getMarkdown() || ''
+            
+            if (!markdown.trim()) {
+                toast.error('文章内容为空，无法生成锐评')
+                return
+            }
+
+            const generatedData = await generateArticleCritique(markdown, title)
+            
+            setAiCritique(generatedData)
+            setIsDirty(true)
+            toast.success('AI 锐评生成完成')
+        } catch (error) {
+            console.error('AI generation failed:', error)
+            // Error handling is done inside generateArticleCritique, but we catch here to stop loading state
+        } finally {
+            setGeneratingAI(false)
+        }
+    }
+
     const fetchArticle = async (articleId: string) => {
         try {
             const { data, error } = await supabase
@@ -286,6 +316,7 @@ export default function ArticleEditor() {
             setTags(data.tags || [])
             setCoverImage(data.cover_image || '')
             setPublished(data.status === 'published' || data.published)
+            setAiCritique(data.ai_critique || null)
 
             const content = data.markdown || data.content || ''
             // Normalize markdown headings to ensure proper parsing
@@ -326,6 +357,7 @@ export default function ArticleEditor() {
                 status: published ? 'published' : 'draft',
                 seo_description: description,
                 updated_at: new Date().toISOString(),
+                ai_critique: aiCritique
             }
 
             let error
@@ -379,6 +411,7 @@ export default function ArticleEditor() {
                 status: published ? 'published' : 'draft',
                 seo_description: description,
                 updated_at: new Date().toISOString(),
+                ai_critique: aiCritique
             }
 
             const { error } = await supabase
@@ -488,6 +521,25 @@ export default function ArticleEditor() {
                             )}
                         </div>
                     )}
+
+                    <Button 
+                        variant="outline" 
+                        onClick={generateAICritique} 
+                        disabled={generatingAI}
+                        className={cn("mr-2 gap-2 border-purple-200 hover:bg-purple-50 hover:text-purple-600 dark:border-purple-800 dark:hover:bg-purple-950", generatingAI && "animate-pulse")}
+                    >
+                        {generatingAI ? (
+                            <>
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                AI 生成中...
+                            </>
+                        ) : (
+                            <>
+                                <Sparkles className="h-4 w-4 text-purple-500" />
+                                {aiCritique ? '重新生成锐评' : 'AI 锐评'}
+                            </>
+                        )}
+                    </Button>
 
                     <Button onClick={handleSave} disabled={saving}>
                         {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -720,6 +772,7 @@ export default function ArticleEditor() {
                                     tags={tags}
                                     createdAt={new Date().toISOString()}
                                     editorJson={previewContent}
+                                    aiCritique={aiCritique}
                                 />
                             </ScrollArea>
                         </div>

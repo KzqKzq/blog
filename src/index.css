@@ -120,18 +120,18 @@
 
 @layer utilities {
   .glass {
-    @apply bg-white/40 dark:bg-slate-900/50 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-lg transition-all duration-300;
+    @apply bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-lg transition-all duration-300;
   }
   
   .glass-card {
-    @apply bg-white/50 dark:bg-slate-900/40 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-xl hover:shadow-2xl transition-all duration-300 hover:bg-white/60 dark:hover:bg-slate-900/60;
+    @apply bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-xl hover:shadow-2xl transition-all duration-300 hover:bg-white/60 dark:hover:bg-slate-900/60;
   }
 
   .glass-button {
-    @apply bg-white/20 dark:bg-white/5 backdrop-blur-md border border-white/20 hover:bg-white/30 dark:hover:bg-white/10 active:scale-95 transition-all;
+    @apply bg-white/50 dark:bg-white/10 backdrop-blur-md border border-white/40 hover:bg-white/60 dark:hover:bg-white/20 active:scale-95 transition-all;
   }
 
   .glass-input {
-    @apply bg-white/20 dark:bg-white/5 backdrop-blur-sm border border-white/20 focus:bg-white/30 dark:focus:bg-white/10 transition-all outline-none ring-offset-0 focus:ring-2 focus:ring-primary/50;
+    @apply bg-white/50 dark:bg-white/10 backdrop-blur-sm border border-white/40 focus:bg-white/60 dark:focus:bg-white/20 transition-all outline-none ring-offset-0 focus:ring-2 focus:ring-primary/50;
   }
 }
